@@ -1,6 +1,6 @@
 ﻿// Module name: PrivmxEndpointCsharpExtra
 // File name: GlobalEvents.cs
-// Last edit: 2025-02-17 08:47 by Mateusz Chojnowski mchojnowsk@simplito.com
+// Last edit: 2025-02-17 22:02 by Mateusz Chojnowski mchojnowsk@simplito.com
 // Copyright (c) Simplito sp. z o.o.
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
@@ -15,11 +15,20 @@ namespace PrivmxEndpointCsharpExtra.Events;
 
 public class GlobalEvents : IDisposable
 {
+	public enum Scope
+	{
+		AllEvents,
+		AllEventsForSpecificConnection,
+		AllEventsForSpecificChannel
+	}
+
 	private readonly NonExistingChannelDispatcher _channelDispatcher;
 	private readonly IEventDispatcher _eventDispatcher;
 	private DisposeBool _disposed;
+	private Scope _scope;
 
-	public GlobalEvents()
+	public GlobalEvents(string channel = PrivMXEventDispatcher.WildcardChannel, long connectionId = 0)
+
 	{
 		_eventDispatcher = PrivMXEventDispatcher.GetDispatcher();
 		_channelDispatcher = new NonExistingChannelDispatcher(_eventDispatcher);
@@ -50,7 +59,7 @@ public class GlobalEvents : IDisposable
 		private static readonly Logger.SourcedLogger<NonExistingChannelDispatcher> Logger = default;
 
 		public NonExistingChannelDispatcher(IEventDispatcher eventDispatcher) : base(
-			PrivMXEventDispatcher.WildcardChannel, eventDispatcher)
+			PrivMXEventDispatcher.WildcardChannel, 0, eventDispatcher)
 		{
 		}
 

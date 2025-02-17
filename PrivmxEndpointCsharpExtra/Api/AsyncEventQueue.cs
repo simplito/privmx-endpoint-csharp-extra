@@ -1,6 +1,6 @@
 ﻿// Module name: PrivmxEndpointCsharpExtra
 // File name: AsyncEventQueue.cs
-// Last edit: 2025-02-17 08:47 by Mateusz Chojnowski mchojnowsk@simplito.com
+// Last edit: 2025-02-17 22:02 by Mateusz Chojnowski mchojnowsk@simplito.com
 // Copyright (c) Simplito sp. z o.o.
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
@@ -12,7 +12,7 @@ using PrivMX.Endpoint.Core;
 using PrivMX.Endpoint.Core.Models;
 using PrivmxEndpointCsharpExtra.Internals;
 
-namespace PrivmxEndpointCsharpExtra.Api.Internal;
+namespace PrivmxEndpointCsharpExtra.Api;
 
 /// <summary>
 ///     Wrapper for event queue that allows to iterate events asynchronously.

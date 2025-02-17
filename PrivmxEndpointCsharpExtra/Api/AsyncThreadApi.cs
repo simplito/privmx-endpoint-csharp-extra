@@ -1,12 +1,13 @@
 ﻿// Module name: PrivmxEndpointCsharpExtra
 // File name: AsyncThreadApi.cs
-// Last edit: 2025-02-17 08:47 by Mateusz Chojnowski mchojnowsk@simplito.com
+// Last edit: 2025-02-17 22:02 by Mateusz Chojnowski mchojnowsk@simplito.com
 // Copyright (c) Simplito sp. z o.o.
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
 
 using System.ComponentModel;
 using Internal;
+using PrivMX.Endpoint.Core;
 using PrivMX.Endpoint.Core.Models;
 using PrivMX.Endpoint.Thread;
 using PrivMX.Endpoint.Thread.Models;
@@ -17,43 +18,48 @@ using Thread = PrivMX.Endpoint.Thread.Models.Thread;
 
 namespace PrivmxEndpointCsharpExtra.Api;
 
-public sealed class AsyncThreadApi : IAsyncDisposable
+/// <summary>
+///     Asynchronous wrapper over thread API.
+/// </summary>
+public sealed class AsyncThreadApi : IAsyncDisposable, IDisposable, IAsyncThreadApi
 {
+	private readonly long _connectionId;
+
 	private readonly IThreadApi _threadApi;
 	private readonly ThreadChannelEventDispatcher _threadChannelEventDispatcher;
 	private readonly Dictionary<string, ThreadMessageChannelEventDispatcher> _threadMessageDispatchers;
 	private DisposeBool _disposed;
+	private readonly IEventDispatcher _eventDispatcher;
 
-
-	public AsyncThreadApi(IThreadApi threadApi)
+	/// <summary>
+	///     Creates async thread API over real PrivMX connection.
+	/// </summary>
+	/// <param name="connection">Connection used.</param>
+	public AsyncThreadApi(Connection connection) : this(ThreadApi.Create(connection), connection.GetConnectionId(),
+		PrivMXEventDispatcher.GetDispatcher())
 	{
-		_threadApi = threadApi;
-		_threadChannelEventDispatcher =
-			new ThreadChannelEventDispatcher(_threadApi, PrivMXEventDispatcher.GetDispatcher());
-		_threadMessageDispatchers = new Dictionary<string, ThreadMessageChannelEventDispatcher>();
 	}
 
 	/// <summary>
 	///     Wraps existing thread api into async thread api.
+	///     This constructor is meant to be used in advanced scenarios like object mocking and testing.
 	/// </summary>
 	/// <param name="threadApi">Existing thread API.</param>
-	/// <param name="eventDispatcher"></param>
+	/// <param name="connectionId">ID of user connection.</param>
+	/// <param name="eventDispatcher">Event dispatcher used as event source.</param>
 	[EditorBrowsable(EditorBrowsableState.Advanced)]
-	public AsyncThreadApi(IThreadApi threadApi, IEventDispatcher eventDispatcher)
+	public AsyncThreadApi(IThreadApi threadApi, long connectionId, IEventDispatcher eventDispatcher)
 	{
 		_threadApi = threadApi;
-		_threadChannelEventDispatcher = new ThreadChannelEventDispatcher(_threadApi, eventDispatcher);
+		_eventDispatcher = eventDispatcher;
+		_connectionId = connectionId;
+		_threadChannelEventDispatcher = new ThreadChannelEventDispatcher(_threadApi, connectionId, eventDispatcher);
 		_threadMessageDispatchers = new Dictionary<string, ThreadMessageChannelEventDispatcher>();
 	}
 
 	public ValueTask DisposeAsync()
 	{
-		if (_disposed.PerformDispose())
-		{
-			_threadChannelEventDispatcher.Dispose();
-			foreach (var disp in _threadMessageDispatchers.Values) disp.Dispose();
-		}
-
+		Dispose();
 		return default;
 	}
 
@@ -145,8 +151,8 @@ public sealed class AsyncThreadApi : IAsyncDisposable
 			if (!_threadMessageDispatchers.TryGetValue(threadId, out var dispatcher))
 			{
 				dispatcher =
-					new ThreadMessageChannelEventDispatcher(threadId, _threadApi,
-						PrivMXEventDispatcher.GetDispatcher());
+					new ThreadMessageChannelEventDispatcher(threadId, _threadApi, _connectionId,
+						_eventDispatcher);
 				_threadMessageDispatchers.Add(threadId, dispatcher);
 			}
 
@@ -154,8 +160,21 @@ public sealed class AsyncThreadApi : IAsyncDisposable
 		}
 	}
 
-	private class ThreadChannelEventDispatcher(IThreadApi connection, IEventDispatcher eventDispatcher)
-		: ChannelEventDispatcher<ThreadEvent>("thread", eventDispatcher)
+
+	public void Dispose()
+	{
+		if (_disposed.PerformDispose())
+		{
+			_threadChannelEventDispatcher.Dispose();
+			foreach (var disp in _threadMessageDispatchers.Values) disp.Dispose();
+		}
+	}
+
+	private class ThreadChannelEventDispatcher(
+		IThreadApi connection,
+		long connectionId,
+		IEventDispatcher eventDispatcher)
+		: ChannelEventDispatcher<ThreadEvent>("thread", connectionId, eventDispatcher)
 	{
 		private IThreadApi Connection { get; } = connection;
 
@@ -199,8 +218,9 @@ public sealed class AsyncThreadApi : IAsyncDisposable
 	private class ThreadMessageChannelEventDispatcher(
 		string threadId,
 		IThreadApi connection,
+		long connectionId,
 		IEventDispatcher eventDispatcher)
-		: ChannelEventDispatcher<ThreadMessageEvent>($"thread/{threadId}/messages", eventDispatcher)
+		: ChannelEventDispatcher<ThreadMessageEvent>($"thread/{threadId}/messages", connectionId, eventDispatcher)
 	{
 		private IThreadApi Connection { get; } = connection;
 		private string ThreadId { get; } = threadId;

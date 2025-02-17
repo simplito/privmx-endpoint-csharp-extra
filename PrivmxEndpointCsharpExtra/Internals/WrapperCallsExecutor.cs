@@ -1,6 +1,6 @@
 ﻿// Module name: PrivmxEndpointCsharpExtra
 // File name: WrapperCallsExecutor.cs
-// Last edit: 2025-02-17 08:47 by Mateusz Chojnowski mchojnowsk@simplito.com
+// Last edit: 2025-02-17 22:02 by Mateusz Chojnowski mchojnowsk@simplito.com
 // Copyright (c) Simplito sp. z o.o.
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
@@ -21,6 +21,10 @@ public static class WrapperCallsExecutor
 		SetDefaultExecutor();
 	}
 
+	/// <summary>
+	///     Sets executor that will be used to dispatch calls to native library.
+	/// </summary>
+	/// <param name="executor">Executor implementation</param>
 	public static void SetExecutor(IWrapperCallsExecutor executor)
 	{
 		_executor = executor;
@@ -38,14 +42,14 @@ public static class WrapperCallsExecutor
 
 	public static void SetDefaultExecutor()
 	{
-		_executor = new NoAbortClassExecutor();
+		_executor = new NoCancellationThreadPoolExecutor();
 	}
 
 	/// <summary>
-	///     Executor that schedules calls to wrapper library onto threadpool threads.
-	///     Executor used on platforms without ControlledExecution and support for Thread.Abort.
+	///     Executor that schedules calls to wrapper library onto thread pool threads.
+	///     Cancellation tokens are ignored.
 	/// </summary>
-	private class NoAbortClassExecutor : IWrapperCallsExecutor
+	private class NoCancellationThreadPoolExecutor : IWrapperCallsExecutor
 	{
 		private static readonly SynchronizationContext _threadPoolSynchronizationContext = new();
 

@@ -1,6 +1,6 @@
 ﻿// Module name: PrivmxEndpointCsharpExtra
 // File name: ChannelEventDispatcher.cs
-// Last edit: 2025-02-17 08:48 by Mateusz Chojnowski mchojnowsk@simplito.com
+// Last edit: 2025-02-17 22:02 by Mateusz Chojnowski mchojnowsk@simplito.com
 // Copyright (c) Simplito sp. z o.o.
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
@@ -12,7 +12,10 @@ using PrivmxEndpointCsharpExtra.Internals;
 
 namespace PrivmxEndpointCsharpExtra.Events;
 
-internal abstract class ChannelEventDispatcher<T>(string channelName, IEventDispatcher eventDispatcher)
+internal abstract class ChannelEventDispatcher<T>(
+	string channelName,
+	long connectioId,
+	IEventDispatcher eventDispatcher)
 	: IObservable<T>, IEventHandler
 {
 	protected static readonly Logger.SourcedLogger<ChannelEventDispatcher<T>> Logger = default;
@@ -28,10 +31,10 @@ internal abstract class ChannelEventDispatcher<T>(string channelName, IEventDisp
 	{
 		if (!_disposed.PerformDispose())
 			return;
-		Logger.Log(LogLevel.Debug, "Disposing");
+		Logger.Log(LogLevel.Trace, "Disposing, channel: {0}, connectionId: {1}", channelName, connectioId);
 		WrappedInvokeObservable?.Dispose();
 		WrappedInvokeObservable = null!;
-		eventDispatcher.RemoveHandler(channelName, this);
+		eventDispatcher.RemoveHandler(channelName, connectioId, this);
 		WrapperCallsExecutor.Execute(() =>
 		{
 			Logger.Log(LogLevel.Debug,
@@ -46,7 +49,7 @@ internal abstract class ChannelEventDispatcher<T>(string channelName, IEventDisp
 					exception);
 			}
 
-			Logger.Log(LogLevel.Debug, "Disposed properly");
+			Logger.Log(LogLevel.Trace, "Disposed properly, channel {0}, connectionId: {1}", channelName, connectioId);
 		}, CancellationToken.None);
 	}
 
@@ -55,7 +58,7 @@ internal abstract class ChannelEventDispatcher<T>(string channelName, IEventDisp
 		_disposed.ThrowIfDisposed(nameof(InvokeObservable<T>));
 		if (Interlocked.Increment(ref _subscribersCount) == 1)
 		{
-			eventDispatcher.AddHandler(channelName, this);
+			eventDispatcher.AddHandler(channelName, connectioId, this);
 			WrapperCallsExecutor.Execute(() =>
 			{
 				Logger.Log(LogLevel.Debug, "Opening chanel for {0}", typeof(T).Name);
@@ -84,7 +87,7 @@ internal abstract class ChannelEventDispatcher<T>(string channelName, IEventDisp
 		Logger.Log(LogLevel.Trace, "Decrementing subscribers count, current count: {0}", _subscribersCount);
 		if (Interlocked.Decrement(ref _subscribersCount) == 0)
 		{
-			eventDispatcher.RemoveHandler(channelName, this);
+			eventDispatcher.RemoveHandler(channelName, connectioId, this);
 			WrapperCallsExecutor.Execute(() =>
 			{
 				Logger.Log(LogLevel.Debug, "Closing chanel for {0}", typeof(T).Name);

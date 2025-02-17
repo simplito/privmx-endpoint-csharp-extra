@@ -1,6 +1,6 @@
 ﻿// Module name: PrivmxEndpointCsharpExtra
 // File name: IEventDispatcher.cs
-// Last edit: 2025-02-17 08:47 by Mateusz Chojnowski mchojnowsk@simplito.com
+// Last edit: 2025-02-17 22:02 by Mateusz Chojnowski mchojnowsk@simplito.com
 // Copyright (c) Simplito sp. z o.o.
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
@@ -17,12 +17,12 @@ public interface IEventDispatcher
 	/// </summary>
 	/// <param name="channelId">Channel related to events consumed by this handler.</param>
 	/// <param name="handler">Incoming events handler.</param>
-	void AddHandler(string channelId, IEventHandler handler);
+	void AddHandler(string channelId, long connectionId, IEventHandler handler);
 
 	/// <summary>
 	///     Removes handler that listens for events related to its channel id.
 	/// </summary>
 	/// <param name="channelId">Channel related to events consumed by this handler.</param>
 	/// <param name="handler">Incoming events handler.</param>
-	void RemoveHandler(string channelId, IEventHandler handler);
+	void RemoveHandler(string channelId, long connectionId, IEventHandler handler);
 }

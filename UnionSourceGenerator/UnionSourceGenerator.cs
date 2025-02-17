@@ -1,6 +1,6 @@
 // Module name: UnionSourceGenerator
 // File name: UnionSourceGenerator.cs
-// Last edit: 2025-02-17 08:47 by Mateusz Chojnowski mchojnowsk@simplito.com
+// Last edit: 2025-02-17 22:02 by Mateusz Chojnowski mchojnowsk@simplito.com
 // Copyright (c) Simplito sp. z o.o.
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
@@ -88,16 +88,16 @@ public class UnionSourceGenerator : ISourceGenerator
 using System.Runtime.InteropServices;
 
 namespace {@namespace};
-
+[StructLayout(LayoutKind.Explicit)]
 public readonly partial struct {structName}
 {{
 	private const byte IsFirstType = 0;
 	private const byte IsSecondType = 1;
-
+	[FieldOffset(0)]
 	private readonly byte _elementSet;
-
+	[FieldOffset(8)]
 	private readonly {firstTypeFullName} _first;
-
+	[FieldOffset(8)]
 	private readonly {secondTypeFullName} _second;
 
 	public Type ElementType
@@ -195,19 +195,19 @@ public readonly partial struct {structName}
 using System.Runtime.InteropServices;
 
 namespace {@namespace};
-
+[StructLayout(LayoutKind.Explicit)]
 public readonly partial struct {structName}
 {{
     private const byte IsFirstType = 0;
     private const byte IsSecondType = 1;
     private const byte IsThirdType = 2;
-
+	[FieldOffset(0)]
     private readonly byte _elementSet;
-
+    [FieldOffset(8)]
     private readonly {firstTypeFullName} _first;
-
+	[FieldOffset(8)]
     private readonly {secondTypeFullName} _second;
-
+	[FieldOffset(8)]
     private readonly {thirdTypeFullName} _third;
 
     public Type ElementType
@@ -324,22 +324,22 @@ public readonly partial struct {structName}
 using System.Runtime.InteropServices;
 
 namespace {@namespace};
-
+[StructLayout(LayoutKind.Explicit)]
 public readonly partial struct {structName}
 {{
     private const byte IsFirstType = 0;
     private const byte IsSecondType = 1;
     private const byte IsThirdType = 2;
     private const byte IsFourthType = 3;
-
+	[FieldOffset(0)]
     private readonly byte _elementSet;
-
+	[FieldOffset(8)]
     private readonly {firstTypeFullName} _first;
-
+    [FieldOffset(8)]
     private readonly {secondTypeFullName} _second;
-
+    [FieldOffset(8)]
     private readonly {thirdTypeFullName} _third;
-
+    [FieldOffset(8)]
     private readonly {fourthTypeFullName} _fourth;
 
     public Type ElementType

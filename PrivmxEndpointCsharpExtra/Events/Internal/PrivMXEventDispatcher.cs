@@ -1,13 +1,13 @@
 ﻿// Module name: PrivmxEndpointCsharpExtra
 // File name: PrivMXEventDispatcher.cs
-// Last edit: 2025-02-17 08:47 by Mateusz Chojnowski mchojnowsk@simplito.com
+// Last edit: 2025-02-17 22:02 by Mateusz Chojnowski mchojnowsk@simplito.com
 // Copyright (c) Simplito sp. z o.o.
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
 
 using Internal;
 using Internal.Extensions;
-using PrivmxEndpointCsharpExtra.Api.Internal;
+using PrivmxEndpointCsharpExtra.Api;
 using PrivmxEndpointCsharpExtra.Internals;
 using Exception = System.Exception;
 
@@ -19,11 +19,12 @@ namespace PrivmxEndpointCsharpExtra.Events.Internal;
 internal sealed class PrivMXEventDispatcher : IEventDispatcher
 {
 	internal const string WildcardChannel = "*";
+	internal const long WildcardConnectionId = 0;
 	private const int IsRunning = 1;
 	private const int IsNotRunning = 0;
-	private static readonly Logger.SourcedLogger<PrivMXEventDispatcher> Logger = default;
-	private static readonly PrivMXEventDispatcher Instance = new();
+	public static readonly PrivMXEventDispatcher Instance = new();
 	private readonly Dictionary<string, IEventHandler> _chanelNameToObservables = new();
+	private readonly Logger.SourcedLogger<PrivMXEventDispatcher> Logger = default;
 	private int _isRunning;
 
 	private PrivMXEventDispatcher()
@@ -37,7 +38,7 @@ internal sealed class PrivMXEventDispatcher : IEventDispatcher
 	private AsyncEventQueue EventQueue { get; }
 	private CancellationTokenSource CancellationTokenSource { get; set; }
 
-	public void AddHandler(string channel, IEventHandler handler)
+	public void AddHandler(string channel, long connectionId, IEventHandler handler)
 	{
 		// ReSharper disable once InconsistentlySynchronizedField
 		if (_chanelNameToObservables.ContainsKey(channel))
@@ -56,7 +57,7 @@ internal sealed class PrivMXEventDispatcher : IEventDispatcher
 		}
 	}
 
-	public void RemoveHandler(string channel, IEventHandler handler)
+	public void RemoveHandler(string channel, long connectionId, IEventHandler handler)
 	{
 		// ReSharper disable once InconsistentlySynchronizedField
 		if (!_chanelNameToObservables.TryGetValue(channel, out var originalHandlers))
