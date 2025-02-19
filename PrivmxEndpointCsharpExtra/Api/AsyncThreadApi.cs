@@ -1,6 +1,6 @@
 ﻿// Module name: PrivmxEndpointCsharpExtra
 // File name: AsyncThreadApi.cs
-// Last edit: 2025-02-17 22:02 by Mateusz Chojnowski mchojnowsk@simplito.com
+// Last edit: 2025-02-19 23:02 by Mateusz Chojnowski mchojnowsk@simplito.com
 // Copyright (c) Simplito sp. z o.o.
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
@@ -11,6 +11,7 @@ using PrivMX.Endpoint.Core;
 using PrivMX.Endpoint.Core.Models;
 using PrivMX.Endpoint.Thread;
 using PrivMX.Endpoint.Thread.Models;
+using PrivmxEndpointCsharpExtra.Api.Interfaces;
 using PrivmxEndpointCsharpExtra.Events;
 using PrivmxEndpointCsharpExtra.Events.Internal;
 using PrivmxEndpointCsharpExtra.Internals;
@@ -24,12 +25,12 @@ namespace PrivmxEndpointCsharpExtra.Api;
 public sealed class AsyncThreadApi : IAsyncDisposable, IDisposable, IAsyncThreadApi
 {
 	private readonly long _connectionId;
+	private readonly IEventDispatcher _eventDispatcher;
 
 	private readonly IThreadApi _threadApi;
 	private readonly ThreadChannelEventDispatcher _threadChannelEventDispatcher;
 	private readonly Dictionary<string, ThreadMessageChannelEventDispatcher> _threadMessageDispatchers;
 	private DisposeBool _disposed;
-	private readonly IEventDispatcher _eventDispatcher;
 
 	/// <summary>
 	///     Creates async thread API over real PrivMX connection.

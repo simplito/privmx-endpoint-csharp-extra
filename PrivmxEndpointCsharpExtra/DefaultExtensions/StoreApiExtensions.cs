@@ -1,13 +1,12 @@
 ﻿// Module name: PrivmxEndpointCsharpExtra
 // File name: StoreApiExtensions.cs
-// Last edit: 2025-02-17 22:02 by Mateusz Chojnowski mchojnowsk@simplito.com
+// Last edit: 2025-02-19 23:02 by Mateusz Chojnowski mchojnowsk@simplito.com
 // Copyright (c) Simplito sp. z o.o.
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
 
 using PrivMX.Endpoint.Core.Models;
 using PrivMX.Endpoint.Store;
-using PrivMX.Endpoint.Store.Models;
 using PrivmxEndpointCsharpExtra.Internals;
 using File = PrivMX.Endpoint.Store.Models.File;
 
@@ -50,14 +49,15 @@ public static class StoreApiExtensions
 		return WrapperCallsExecutor.Execute(() => api.DeleteStore(storeId), token);
 	}
 
-	public static ValueTask<Store> GetStoreAsync(this IStoreApi api, string storeId,
+	public static ValueTask<PrivMX.Endpoint.Store.Models.Store> GetStoreAsync(this IStoreApi api, string storeId,
 		CancellationToken token = default)
 	{
 		if (api == null) throw new ArgumentNullException(nameof(api));
 		return WrapperCallsExecutor.Execute(() => api.GetStore(storeId), token);
 	}
 
-	public static ValueTask<PagingList<Store>> ListStoresAsync(this IStoreApi api, string contextId,
+	public static ValueTask<PagingList<PrivMX.Endpoint.Store.Models.Store>> ListStoresAsync(this IStoreApi api,
+		string contextId,
 		PagingQuery pagingQuery, CancellationToken token = default)
 	{
 		if (api == null) throw new ArgumentNullException(nameof(api));

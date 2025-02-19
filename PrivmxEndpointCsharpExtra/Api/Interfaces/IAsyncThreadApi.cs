@@ -1,6 +1,6 @@
 ﻿// Module name: PrivmxEndpointCsharpExtra
 // File name: IAsyncThreadApi.cs
-// Last edit: 2025-02-17 20:02 by Mateusz Chojnowski mchojnowsk@simplito.com
+// Last edit: 2025-02-19 23:02 by Mateusz Chojnowski mchojnowsk@simplito.com
 // Copyright (c) Simplito sp. z o.o.
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
@@ -10,7 +10,7 @@ using PrivMX.Endpoint.Thread.Models;
 using PrivmxEndpointCsharpExtra.Events;
 using Thread = PrivMX.Endpoint.Thread.Models.Thread;
 
-namespace PrivmxEndpointCsharpExtra.Api;
+namespace PrivmxEndpointCsharpExtra.Api.Interfaces;
 
 public interface IAsyncThreadApi
 {
