@@ -21,8 +21,8 @@ public sealed class StoreReadonlyFileStream : Stream
 	private readonly long _fileHandle;
 	private DisposeBool _disposed;
 	private long _position;
-	internal byte[] _privateMeta;
-	internal byte[] _publicMeta;
+	private readonly byte[] _privateMeta;
+	private readonly byte[] _publicMeta;
 	private IStoreApi _storeApi;
 
 	internal StoreReadonlyFileStream(long size, long fileHandle, IStoreApi storeApi, byte[] publicMeta,

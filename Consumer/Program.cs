@@ -41,7 +41,7 @@ internal class Program
 		using (globalEvents.AllEvents()
 			       .Subscribe(ev =>
 				       Console.WriteLine(
-					       $"Observer - Channel: {ev.Channel}, Type: {ev.Type}, Instance id: {ev.ConnectionId}")))
+					       $"GlobalObserver - Channel: {ev.Channel}, Type: {ev.Type}, Instance id: {ev.ConnectionId}")))
 		{
 			await TestStore.Test();
 			// var origConnection =

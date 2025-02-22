@@ -5,11 +5,17 @@
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
 
+using System.ComponentModel;
 using Internal;
 using PrivMX.Endpoint.Core;
 using PrivMX.Endpoint.Core.Models;
 using PrivMX.Endpoint.Store;
+using PrivMX.Endpoint.Store.Models;
+using PrivMX.Endpoint.Thread.Models;
 using PrivmxEndpointCsharpExtra.Api.Interfaces;
+using PrivmxEndpointCsharpExtra.Events;
+using PrivmxEndpointCsharpExtra.Events.Internal;
+using PrivmxEndpointCsharpExtra.Internals;
 using PrivmxEndpointCsharpExtra.Store;
 using File = PrivMX.Endpoint.Store.Models.File;
 
@@ -20,16 +26,32 @@ public class AsyncStoreApi : IAsyncDisposable, IDisposable, IAsyncStoreApi
 	private long _connectionId;
 	private DisposeBool _disposed;
 	private IStoreApi _storeApi;
+	private IEventDispatcher _eventDispatcher;
+	private readonly StoreChannelEnventDispatcher _threadChannelEventDispatcher;
+	private readonly Dictionary<string, StoreFileEventDispatcher> _threadMessageDispatchers;
+
+	/// <summary>
+	///     Wraps existing thread api into async thread api.
+	///     This constructor is meant to be used in advanced scenarios like object mocking and testing.
+	/// </summary>
+	/// <param name="storeApi">Existing thread API.</param>
+	/// <param name="connectionId">ID of user connection.</param>
+	/// <param name="eventDispatcher">Event dispatcher used as event source.</param>
+	[EditorBrowsable(EditorBrowsableState.Advanced)]
+	public AsyncStoreApi(IStoreApi storeApi, long connectionId, IEventDispatcher eventDispatcher)
+	{
+		_storeApi = storeApi;
+		_connectionId = connectionId;
+		_eventDispatcher = eventDispatcher;
+		_threadChannelEventDispatcher = new StoreChannelEnventDispatcher(_storeApi, connectionId, eventDispatcher);
+		_threadMessageDispatchers = new Dictionary<string, StoreFileEventDispatcher>();
+	}
 
 	/// <summary>
 	///     Creates a new instance of the store api over real privmx connection.
 	/// </summary>
 	/// <param name="connection"></param>
-	public AsyncStoreApi(Connection connection)
-	{
-		_storeApi = StoreApi.Create(connection);
-		_connectionId = connection.GetConnectionId();
-	}
+	public AsyncStoreApi(Connection connection) : this(StoreApi.Create(connection), connection.GetConnectionId(), PrivMXEventDispatcher.GetDispatcher()) { }
 
 	public ValueTask DisposeAsync()
 	{
@@ -125,30 +147,21 @@ public class AsyncStoreApi : IAsyncDisposable, IDisposable, IAsyncStoreApi
 		return _storeApi.ListFilesAsync(storeId, pagingQuery, token);
 	}
 
-	public StoreWriteFileStream CreateFile(string storeId, CancellationToken token = default)
+	public async ValueTask<StoreWriteFileStream> CreateFile(string storeId, long size, byte[] publicMeta, byte[] privateMeta, byte? fillValue = null, CancellationToken token = default)
 	{
 		_disposed.ThrowIfDisposed(nameof(AsyncStoreApi));
-		return new StoreWriteFileStream(storeId, null, [], [], [], _storeApi);
+		token.ThrowIfCancellationRequested();
+		var handle = await _storeApi.CreateFileAsync(storeId, publicMeta, privateMeta, size, token);
+		return new StoreWriteFileStream(null, handle, size, fillValue, _storeApi);
 	}
 
-	public async ValueTask<StoreWriteFileStream> OpenFileForWrite(string fileId, IAsyncStoreApi.WriteOpen mode,
+	public async ValueTask<StoreWriteFileStream> OpenFileForWrite(string fileId, long size, byte[] publicMeta, byte[] privateMeta, byte? fillValue = null,
 		CancellationToken token = default)
 	{
 		_disposed.ThrowIfDisposed(nameof(AsyncStoreApi));
 		token.ThrowIfCancellationRequested();
-		if (mode == IAsyncStoreApi.WriteOpen.Append)
-		{
-			byte[] buffer;
-			await using var source = await OpenFileForRead(fileId, token);
-			token.ThrowIfCancellationRequested();
-			buffer = new byte[source.Length];
-			var bytesRead = await source.ReadAsync(buffer, token);
-			if (bytesRead != source.Length) throw new InvalidOperationException("Failed to read the whole file.");
-			return new StoreWriteFileStream(null, fileId, buffer, source._publicMeta, source._privateMeta, _storeApi);
-		}
-
-		var meta = await _storeApi.GetFileAsync(fileId, token);
-		return new StoreWriteFileStream(null, fileId, [], meta.PublicMeta, meta.PrivateMeta, _storeApi);
+		var handle = await _storeApi.UpdateFileAsync(fileId, publicMeta, privateMeta, size, token);
+		return new StoreWriteFileStream(fileId, handle, size, fillValue, _storeApi);
 	}
 
 	public async ValueTask<StoreReadonlyFileStream> OpenFileForRead(string fileId, CancellationToken token = default)
@@ -172,5 +185,111 @@ public class AsyncStoreApi : IAsyncDisposable, IDisposable, IAsyncStoreApi
 	{
 		_disposed.PerformDispose();
 		_storeApi = null!;
+	}
+
+	public IObservable<StoreEvent> GetStoreEvents()
+	{
+		_disposed.ThrowIfDisposed(nameof(AsyncStoreApi));
+		return _threadChannelEventDispatcher;
+	}
+
+	public IObservable<StoreFileEvent> GetFileEvents(string storeId)
+	{
+		_disposed.ThrowIfDisposed(nameof(AsyncStoreApi));
+		lock (_threadChannelEventDispatcher)
+		{
+			if (!_threadMessageDispatchers.TryGetValue(storeId, out var dispatcher))
+			{
+				dispatcher =
+					new StoreFileEventDispatcher(storeId, _storeApi, _connectionId,
+						_eventDispatcher);
+				_threadMessageDispatchers.Add(storeId, dispatcher);
+			}
+
+			return dispatcher;
+		}
+	}
+
+	private class StoreChannelEnventDispatcher(
+		IStoreApi connection,
+		long connectionId,
+		IEventDispatcher eventDispatcher)
+		: ChannelEventDispatcher<StoreEvent>("store", connectionId, eventDispatcher)
+	{
+		private IStoreApi Connection { get; } = connection;
+
+		protected override void OpenChanel()
+		{
+			Connection.SubscribeForStoreEvents();
+		}
+
+		protected override void CloseChanel()
+		{
+			Connection.UnsubscribeFromStoreEvents();
+		}
+
+		public override void HandleEvent(Event @event)
+		{
+			switch (@event)
+			{
+				case StoreCreatedEvent createdEvent:
+					WrappedInvokeObservable.Send(
+						new StoreEvent(createdEvent));
+					break;
+				case StoreDeletedEvent deletedEvent:
+					WrappedInvokeObservable.Send(
+						new StoreEvent(deletedEvent));
+					break;
+				case StoreUpdatedEvent updatedEvent:
+					WrappedInvokeObservable.Send(
+						new StoreEvent(updatedEvent));
+					break;
+				default:
+					Logger.Log(LogLevel.Warning, "Invalid event was passed to channel dispatcher: {0}.", @event);
+					break;
+			}
+		}
+	}
+
+	private class StoreFileEventDispatcher(
+		string storeId,
+		IStoreApi connection,
+		long connectionId,
+		IEventDispatcher eventDispatcher)
+		: ChannelEventDispatcher<StoreFileEvent>($"store/{storeId}/files", connectionId, eventDispatcher)
+	{
+		private IStoreApi Connection { get; } = connection;
+
+		protected override void OpenChanel()
+		{
+			Connection.SubscribeForFileEvents(storeId);
+		}
+
+		protected override void CloseChanel()
+		{
+			Connection.UnsubscribeFromFileEvents(storeId);
+		}
+
+		public override void HandleEvent(Event @event)
+		{
+			switch (@event)
+			{
+				case StoreFileCreatedEvent createdEvent:
+					WrappedInvokeObservable.Send(
+						new StoreFileEvent(createdEvent));
+					break;
+				case StoreFileDeletedEvent deletedEvent:
+					WrappedInvokeObservable.Send(
+						new StoreFileEvent(deletedEvent));
+					break;
+				case StoreFileUpdatedEvent updatedEvent:
+					WrappedInvokeObservable.Send(
+						new StoreFileEvent(updatedEvent));
+					break;
+				default:
+					Logger.Log(LogLevel.Warning, "Invalid event was passed to channel dispatcher: {0}.", @event);
+					break;
+			}
+		}
 	}
 }
