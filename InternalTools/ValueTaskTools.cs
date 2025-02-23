@@ -1,6 +1,6 @@
 ﻿// Module name: InternalTools
 // File name: ValueTaskTools.cs
-// Last edit: 2025-02-23 10:02 by Mateusz Chojnowski mchojnowsk@simplito.com
+// Last edit: 2025-02-23 23:02 by Mateusz Chojnowski mchojnowsk@simplito.com
 // Copyright (c) Simplito sp. z o.o.
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
@@ -13,7 +13,7 @@ namespace Internal;
 
 public class ValueTaskTools
 {
-	#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
 	public static async ValueTask WhenAll(params ValueTask[] tasks)
 	{
 		if (tasks is null)
@@ -29,10 +29,10 @@ public class ValueTaskTools
 			}
 			catch (Exception ex)
 			{
-				exceptions ??= new(tasks.Length);
+				exceptions ??= new List<Exception>(tasks.Length);
 				exceptions.Add(ex);
 			}
-		
+
 		if (exceptions is not null)
 			throw new AggregateException(exceptions);
 	}
@@ -55,7 +55,7 @@ public class ValueTaskTools
 			}
 			catch (Exception ex)
 			{
-				exceptions ??= new(tasks.Length);
+				exceptions ??= new List<Exception>(tasks.Length);
 				exceptions.Add(ex);
 			}
 

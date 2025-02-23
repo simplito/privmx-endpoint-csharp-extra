@@ -1,6 +1,6 @@
 ﻿// Module name: InternalTools
 // File name: SynchronizationContextAwaiter.cs
-// Last edit: 2025-02-17 08:48 by Mateusz Chojnowski mchojnowsk@simplito.com
+// Last edit: 2025-02-23 23:02 by Mateusz Chojnowski mchojnowsk@simplito.com
 // Copyright (c) Simplito sp. z o.o.
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
