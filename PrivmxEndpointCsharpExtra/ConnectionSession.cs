@@ -5,28 +5,37 @@
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
 
+using System.Diagnostics.CodeAnalysis;
 using Internal;
+using PrivMX.Endpoint.Core;
 using PrivmxEndpointCsharpExtra.Api;
 using PrivmxEndpointCsharpExtra.Api.Interfaces;
+using PrivmxEndpointCsharpExtra.Events.Internal;
+using PrivmxEndpointCsharpExtra.Internals;
 
 namespace PrivmxEndpointCsharpExtra;
 
 /// <summary>
 ///     Container class that wraps single connection and manages its state.
+///     Exposes all APIs that are available for the connection.
+///     Disposing connection session automatically disposes all APIs.
 /// </summary>
 public sealed class ConnectionSession : IAsyncDisposable
 {
+	private static readonly Logger.SourcedLogger<ConnectionSession> Logger = default;
 	private readonly AsyncConnection _connection;
 	private readonly AsyncStoreApi _storeApi;
 	private readonly AsyncThreadApi _threadApi;
+	private readonly AsyncInboxApi _inboxApi;
 	private DisposeBool _disposed;
 
 	private ConnectionSession(string publicKey, string privateKey, AsyncConnection connection, AsyncThreadApi threadApi,
-		AsyncStoreApi storeApi)
+		AsyncStoreApi storeApi, AsyncInboxApi inboxApi)
 	{
 		_connection = connection;
 		_threadApi = threadApi;
 		_storeApi = storeApi;
+		_inboxApi = inboxApi;
 		PublicKey = publicKey;
 		PrivateKey = privateKey;
 	}
@@ -50,28 +59,52 @@ public sealed class ConnectionSession : IAsyncDisposable
 	public IAsyncStoreApi StoreApi =>
 		_disposed ? throw new ObjectDisposedException(nameof(ConnectionSession)) : _storeApi;
 
+	public IAsyncInboxApi InboxApi =>
+		_disposed ? throw new ObjectDisposedException(nameof(ConnectionSession)) : _inboxApi;
+
+	[SuppressMessage("Reliability", "CA2012")]
 	public async ValueTask DisposeAsync()
 	{
 		if (!_disposed.PerformDispose())
 			return;
-		await _connection.DisposeAsync();
-		await _threadApi.DisposeAsync();
-		await _storeApi.DisposeAsync();
+		try
+		{
+			await ValueTaskTools.WhenAll(_connection.DisposeAsync(), _threadApi.DisposeAsync(), _storeApi.DisposeAsync(), _inboxApi.DisposeAsync());
+		}
+		catch (Exception e)
+		{
+			Logger.Log(LogLevel.Error, "Unhandled exception during dispose.", e);
+			Internals.Logger.PublishUnobservedException(e);
+		}
 	}
 
 	public static async ValueTask<ConnectionSession> Create(string userPrivateKey, string publicKey, string solutionId,
 		string platformUrl, CancellationToken token = default)
 	{
 		var connection = await ConnectionAsyncExtensions.ConnectAsync(userPrivateKey, solutionId, platformUrl, token);
-		return new ConnectionSession(publicKey, userPrivateKey, new AsyncConnection(connection),
-			new AsyncThreadApi(connection), new AsyncStoreApi(connection));
+		return CreateInternal(connection, publicKey, userPrivateKey);
 	}
 
 	public static async ValueTask<ConnectionSession> CreatePublic(string solutionId, string platformUrl,
 		CancellationToken token = default)
 	{
 		var connection = await ConnectionAsyncExtensions.ConnectPublicAsync(solutionId, platformUrl, token);
-		return new ConnectionSession(string.Empty, string.Empty, new AsyncConnection(connection),
-			new AsyncThreadApi(connection), new AsyncStoreApi(connection));
+		return CreateInternal(connection, string.Empty, string.Empty);
 	}
+
+	private static ConnectionSession CreateInternal(Connection connection, string publicKey, string privateKey)
+	{
+		var connectionId = connection.GetConnectionId();
+		var asyncConnection = new AsyncConnection(connection);
+		var threadApi = PrivMX.Endpoint.Thread.ThreadApi.Create(connection);
+		var storeApi = PrivMX.Endpoint.Store.StoreApi.Create(connection);
+		var inboxApi = PrivMX.Endpoint.Inbox.InboxApi.Create(connection, threadApi, storeApi);
+		var eventDispatcher = PrivMXEventDispatcher.Instance;
+		var asyncThreadApi = new AsyncThreadApi(threadApi, connectionId, eventDispatcher);
+		var asyncStoreApi = new AsyncStoreApi(storeApi, connectionId, eventDispatcher);
+		var asyncInboxApi = new AsyncInboxApi(inboxApi, connectionId, eventDispatcher);
+		return new ConnectionSession(publicKey, privateKey, asyncConnection, asyncThreadApi, asyncStoreApi, asyncInboxApi);
+	}                                                                   
+
+
 }

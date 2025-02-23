@@ -10,7 +10,7 @@ using PrivmxEndpointCsharpExtra;
 
 namespace Consumer;
 
-public class TestStore
+public static class TestStore
 {      
 	public static async Task Test()
 	{

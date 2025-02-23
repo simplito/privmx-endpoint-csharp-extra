@@ -77,11 +77,6 @@ internal sealed class PrivMXEventDispatcher : IEventDispatcher
 		}
 	}
 
-	public static PrivMXEventDispatcher GetDispatcher()
-	{
-		return Instance;
-	}
-
 	~PrivMXEventDispatcher()
 	{
 		CancellationTokenSource.Cancel();

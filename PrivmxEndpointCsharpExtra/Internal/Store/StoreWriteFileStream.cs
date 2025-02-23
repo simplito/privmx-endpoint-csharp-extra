@@ -7,6 +7,7 @@
 
 using Internal;
 using PrivMX.Endpoint.Store;
+using PrivmxEndpointCsharpExtra.Abstractions;
 using PrivmxEndpointCsharpExtra.Internals;
 
 namespace PrivmxEndpointCsharpExtra.Store;
@@ -15,7 +16,7 @@ namespace PrivmxEndpointCsharpExtra.Store;
 /// All data is written to the store when file is closed/disposed.
 /// This class is not thread safe.
 /// </summary>
-public sealed class StoreWriteFileStream : Stream
+internal sealed class StoreWriteFileStream : PrivmxFileStream
 {
 	private static readonly Logger.SourcedLogger<StoreWriteFileStream> Logger = default;
 	private DisposeBool _disposed = new();
@@ -23,20 +24,29 @@ public sealed class StoreWriteFileStream : Stream
 	private readonly long _fileHandle;
 	private long _position;
 	private readonly byte? _fillValue = null;
+	private string? _fileId;
+	private readonly byte[] _publicMeta;
+	private readonly byte[] _privateMeta;
+	public override string? FileId => _fileId;
+
+	public override ReadOnlySpan<byte> PublicMeta => _publicMeta;
+
+	public override ReadOnlySpan<byte> PrivateMeta => _privateMeta;
+
 	/// <summary>
 	/// File ID. May be null if file is not yet created.
 	/// May change after object disposal when the file is closed and saved on the server.
 	/// </summary>
-	public string? FileId { get; private set; }
-
-	internal StoreWriteFileStream(string? fileId, long fileHandle, long size, byte? fillValue, IStoreApi storeApi)
+	internal StoreWriteFileStream(string? fileId, long fileHandle, long size, byte[] publicMeta, byte[] privateMeta, byte? fillValue, IStoreApi storeApi)
 	{
 		Logger.Log(LogLevel.Trace, "Creating new StoreWriteFileStream, handle: {0}, fileId: {1}, fileLength: {2}", fileId, fileId, size);
 		_fileHandle = fileHandle;
-		FileId = fileId;
+			_fileId= fileId;
 		Length = size;
 		_storeApi = storeApi;
 		_fillValue = fillValue;
+		_publicMeta = publicMeta;
+		_privateMeta = privateMeta;
 	}
 
 	public override void Flush()
@@ -89,7 +99,7 @@ public sealed class StoreWriteFileStream : Stream
 		{
 			if (_fillValue.HasValue)
 				Fill(_fillValue.Value);
-			FileId = _storeApi.CloseFile(_fileHandle);
+			_fileId = _storeApi.CloseFile(_fileHandle);
 		}
 		catch (Exception exception)
 		{
@@ -113,7 +123,7 @@ public sealed class StoreWriteFileStream : Stream
 		{
 			if (_fillValue.HasValue)
 				await FillAsync(_fillValue.Value);
-			FileId = await _storeApi.CloseFileAsync(_fileHandle);
+			_fileId = await _storeApi.CloseFileAsync(_fileHandle);
 		}
 		catch (Exception exception)
 		{

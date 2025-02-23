@@ -12,6 +12,7 @@ using PrivMX.Endpoint.Core.Models;
 using PrivMX.Endpoint.Store;
 using PrivMX.Endpoint.Store.Models;
 using PrivMX.Endpoint.Thread.Models;
+using PrivmxEndpointCsharpExtra.Abstractions;
 using PrivmxEndpointCsharpExtra.Api.Interfaces;
 using PrivmxEndpointCsharpExtra.Events;
 using PrivmxEndpointCsharpExtra.Events.Internal;
@@ -23,12 +24,13 @@ namespace PrivmxEndpointCsharpExtra.Api;
 
 public class AsyncStoreApi : IAsyncDisposable, IDisposable, IAsyncStoreApi
 {
+	private static readonly Logger.SourcedLogger<AsyncStoreApi> Logger = default;
 	private long _connectionId;
 	private DisposeBool _disposed;
 	private IStoreApi _storeApi;
 	private IEventDispatcher _eventDispatcher;
-	private readonly StoreChannelEnventDispatcher _threadChannelEventDispatcher;
-	private readonly Dictionary<string, StoreFileEventDispatcher> _threadMessageDispatchers;
+	private StoreChannelEnventDispatcher _storeChannelEventDispatcher;
+	private Dictionary<string, StoreFileEventDispatcher> _storeFileDispatchers;
 
 	/// <summary>
 	///     Wraps existing thread api into async thread api.
@@ -43,15 +45,15 @@ public class AsyncStoreApi : IAsyncDisposable, IDisposable, IAsyncStoreApi
 		_storeApi = storeApi;
 		_connectionId = connectionId;
 		_eventDispatcher = eventDispatcher;
-		_threadChannelEventDispatcher = new StoreChannelEnventDispatcher(_storeApi, connectionId, eventDispatcher);
-		_threadMessageDispatchers = new Dictionary<string, StoreFileEventDispatcher>();
+		_storeChannelEventDispatcher = new StoreChannelEnventDispatcher(_storeApi, connectionId, eventDispatcher);
+		_storeFileDispatchers = new Dictionary<string, StoreFileEventDispatcher>();
 	}
 
 	/// <summary>
 	///     Creates a new instance of the store api over real privmx connection.
 	/// </summary>
 	/// <param name="connection"></param>
-	public AsyncStoreApi(Connection connection) : this(StoreApi.Create(connection), connection.GetConnectionId(), PrivMXEventDispatcher.GetDispatcher()) { }
+	public AsyncStoreApi(Connection connection) : this(StoreApi.Create(connection), connection.GetConnectionId(), PrivMXEventDispatcher.Instance) { }
 
 	public ValueTask DisposeAsync()
 	{
@@ -147,30 +149,30 @@ public class AsyncStoreApi : IAsyncDisposable, IDisposable, IAsyncStoreApi
 		return _storeApi.ListFilesAsync(storeId, pagingQuery, token);
 	}
 
-	public async ValueTask<StoreWriteFileStream> CreateFile(string storeId, long size, byte[] publicMeta, byte[] privateMeta, byte? fillValue = null, CancellationToken token = default)
+	public async ValueTask<PrivmxFileStream> CreateFile(string storeId, long size, byte[] publicMeta, byte[] privateMeta, byte? fillValue = null, CancellationToken token = default)
 	{
 		_disposed.ThrowIfDisposed(nameof(AsyncStoreApi));
 		token.ThrowIfCancellationRequested();
 		var handle = await _storeApi.CreateFileAsync(storeId, publicMeta, privateMeta, size, token);
-		return new StoreWriteFileStream(null, handle, size, fillValue, _storeApi);
+		return new StoreWriteFileStream(null, handle, size, publicMeta, privateMeta, fillValue, _storeApi);
 	}
 
-	public async ValueTask<StoreWriteFileStream> OpenFileForWrite(string fileId, long size, byte[] publicMeta, byte[] privateMeta, byte? fillValue = null,
+	public async ValueTask<PrivmxFileStream> OpenFileForWrite(string fileId, long size, byte[] publicMeta, byte[] privateMeta, byte? fillValue = null,
 		CancellationToken token = default)
 	{
 		_disposed.ThrowIfDisposed(nameof(AsyncStoreApi));
 		token.ThrowIfCancellationRequested();
 		var handle = await _storeApi.UpdateFileAsync(fileId, publicMeta, privateMeta, size, token);
-		return new StoreWriteFileStream(fileId, handle, size, fillValue, _storeApi);
+		return new StoreWriteFileStream(fileId, handle, size, publicMeta, privateMeta, fillValue, _storeApi);
 	}
 
-	public async ValueTask<StoreReadonlyFileStream> OpenFileForRead(string fileId, CancellationToken token = default)
+	public async ValueTask<PrivmxFileStream> OpenFileForRead(string fileId, CancellationToken token = default)
 	{
 		_disposed.ThrowIfDisposed(nameof(AsyncStoreApi));
 		var meta = _storeApi.GetFileAsync(fileId, token).AsTask();
 		var handle = _storeApi.OpenFileAsync(fileId, token).AsTask();
 		await Task.WhenAll(meta, handle);
-		return new StoreReadonlyFileStream(meta.Result.Size, handle.Result, _storeApi,
+		return new StoreReadonlyFileStream(fileId, meta.Result.Size, handle.Result, _storeApi,
 			meta.Result.PublicMeta, meta.Result.PrivateMeta);
 	}
 
@@ -183,27 +185,45 @@ public class AsyncStoreApi : IAsyncDisposable, IDisposable, IAsyncStoreApi
 
 	public void Dispose()
 	{
-		_disposed.PerformDispose();
+		if(!_disposed.PerformDispose())
+			 return;
+		var exceptions = _storeFileDispatchers.Values.ForEachNotThrowing(dispatcher => dispatcher.Dispose());
+		_storeFileDispatchers = null!;
+		try
+		{
+			_storeChannelEventDispatcher.Dispose();
+		}
+		catch (Exception exception)
+		{
+			(exceptions ??= new List<Exception>()).Add(exception);
+		}
+
+		_storeChannelEventDispatcher = null!;
 		_storeApi = null!;
+		if (exceptions is not null)
+		{
+			var exception = new AggregateException(exceptions);
+			throw exception;
+		}
 	}
 
 	public IObservable<StoreEvent> GetStoreEvents()
 	{
 		_disposed.ThrowIfDisposed(nameof(AsyncStoreApi));
-		return _threadChannelEventDispatcher;
+		return _storeChannelEventDispatcher;
 	}
 
 	public IObservable<StoreFileEvent> GetFileEvents(string storeId)
 	{
 		_disposed.ThrowIfDisposed(nameof(AsyncStoreApi));
-		lock (_threadChannelEventDispatcher)
+		lock (_storeFileDispatchers)
 		{
-			if (!_threadMessageDispatchers.TryGetValue(storeId, out var dispatcher))
+			if (!_storeFileDispatchers.TryGetValue(storeId, out var dispatcher))
 			{
 				dispatcher =
 					new StoreFileEventDispatcher(storeId, _storeApi, _connectionId,
 						_eventDispatcher);
-				_threadMessageDispatchers.Add(storeId, dispatcher);
+				_storeFileDispatchers.Add(storeId, dispatcher);
 			}
 
 			return dispatcher;

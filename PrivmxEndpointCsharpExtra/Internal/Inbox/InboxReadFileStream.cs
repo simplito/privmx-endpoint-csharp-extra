@@ -6,26 +6,27 @@
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
 
 using Internal;
-using PrivMX.Endpoint.Store;
+using PrivMX.Endpoint.Inbox;
+using PrivmxEndpointCsharpExtra.Abstractions;
 using PrivmxEndpointCsharpExtra.Internals;
 
-namespace PrivmxEndpointCsharpExtra.Store;
+namespace PrivmxEndpointCsharpExtra.Inbox;
 
 /// <summary>
 ///     Stream that reads data from store file.
 ///     This class is not thread safe.
 /// </summary>
-public sealed class StoreReadonlyFileStream : Stream
+public sealed class InboxReadFileStream : PrivmxFileStream
 {
-	private static readonly Logger.SourcedLogger<StoreReadonlyFileStream> Logger = default;
+	private static readonly Logger.SourcedLogger<InboxReadFileStream> Logger = default;
 	private readonly long _fileHandle;
 	private DisposeBool _disposed;
 	private long _position;
 	private readonly byte[] _privateMeta;
 	private readonly byte[] _publicMeta;
-	private IStoreApi _storeApi;
+	private IInboxApi _storeApi;
 
-	internal StoreReadonlyFileStream(long size, long fileHandle, IStoreApi storeApi, byte[] publicMeta,
+	internal InboxReadFileStream(long size, long fileHandle, IInboxApi storeApi, byte[] publicMeta,
 		byte[] privateMeta)
 	{
 		_storeApi = storeApi;
@@ -35,8 +36,9 @@ public sealed class StoreReadonlyFileStream : Stream
 		Length = size;
 	}
 
-	public ReadOnlySpan<byte> PublicMeta => _publicMeta;
-	public ReadOnlySpan<byte> PrivateMeta => _privateMeta;
+	public override string? FileId { get; }
+	public override ReadOnlySpan<byte> PublicMeta => _publicMeta;
+	public override ReadOnlySpan<byte> PrivateMeta => _privateMeta;
 
 	public override bool CanRead => !_disposed;
 	public override bool CanSeek => !_disposed;
@@ -56,7 +58,7 @@ public sealed class StoreReadonlyFileStream : Stream
 
 	public override int Read(byte[] buffer, int offset, int count)
 	{
-		_disposed.ThrowIfDisposed(nameof(StoreReadonlyFileStream));
+		_disposed.ThrowIfDisposed(nameof(InboxReadFileStream));
 		var read = _storeApi.ReadFromFile(_fileHandle, Math.Min(count, Length - _position));
 		_position += read.Length;
 		Array.Copy(read, 0, buffer, offset, read.Length);
@@ -65,7 +67,7 @@ public sealed class StoreReadonlyFileStream : Stream
 
 	public override long Seek(long offset, SeekOrigin origin)
 	{
-		_disposed.ThrowIfDisposed(nameof(StoreReadonlyFileStream));
+		_disposed.ThrowIfDisposed(nameof(InboxReadFileStream));
 		switch (origin)
 		{
 			case SeekOrigin.Begin:
@@ -94,7 +96,7 @@ public sealed class StoreReadonlyFileStream : Stream
 
 	private void SetPosition(long position)
 	{
-		_disposed.ThrowIfDisposed(nameof(StoreReadonlyFileStream));
+		_disposed.ThrowIfDisposed(nameof(InboxReadFileStream));
 		_storeApi.SeekInFile(_fileHandle, position);
 		_position = position;
 	}
@@ -109,6 +111,8 @@ public sealed class StoreReadonlyFileStream : Stream
 		}
 		catch (Exception exception)
 		{
+			if (disposing)
+				throw;
 			Logger.Log(LogLevel.Error, "Unhandled exception during dispose.", exception);
 			Internals.Logger.PublishUnobservedException(exception);
 		}

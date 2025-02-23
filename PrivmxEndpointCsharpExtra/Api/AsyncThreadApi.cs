@@ -37,7 +37,7 @@ public sealed class AsyncThreadApi : IAsyncDisposable, IDisposable, IAsyncThread
 	/// </summary>
 	/// <param name="connection">Connection used.</param>
 	public AsyncThreadApi(Connection connection) : this(ThreadApi.Create(connection), connection.GetConnectionId(),
-		PrivMXEventDispatcher.GetDispatcher())
+		PrivMXEventDispatcher.Instance)
 	{
 	}
 
@@ -147,7 +147,7 @@ public sealed class AsyncThreadApi : IAsyncDisposable, IDisposable, IAsyncThread
 	public IObservable<ThreadMessageEvent> GetThreadMessageEvents(string threadId)
 	{
 		_disposed.ThrowIfDisposed(nameof(AsyncThreadApi));
-		lock (_threadChannelEventDispatcher)
+		lock (_threadMessageDispatchers)
 		{
 			if (!_threadMessageDispatchers.TryGetValue(threadId, out var dispatcher))
 			{
@@ -167,7 +167,9 @@ public sealed class AsyncThreadApi : IAsyncDisposable, IDisposable, IAsyncThread
 		if (_disposed.PerformDispose())
 		{
 			_threadChannelEventDispatcher.Dispose();
-			foreach (var disp in _threadMessageDispatchers.Values) disp.Dispose();
+			var exceptions = _threadMessageDispatchers.Values.ForEachNotThrowing(obj => obj.Dispose());
+			if (exceptions is not null)
+				throw new AggregateException(exceptions);
 		}
 	}
 

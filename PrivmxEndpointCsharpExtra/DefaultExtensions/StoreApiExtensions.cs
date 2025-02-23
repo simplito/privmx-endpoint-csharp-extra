@@ -35,7 +35,7 @@ public static class StoreApiExtensions
 	/// <exception cref="ArgumentNullException">Thrown when api is null.</exception>
 	public static ValueTask UpdateStoreAsync(this IStoreApi api, string storeId, List<UserWithPubKey> users,
 		List<UserWithPubKey> managers, byte[] publicMeta, byte[] privateMeta, long version, bool force,
-		bool forceGenerateNewKey, ContainerPolicy containerPolicy = null, CancellationToken token = default)
+		bool forceGenerateNewKey, ContainerPolicy? containerPolicy = null, CancellationToken token = default)
 	{
 		if (api == null) throw new ArgumentNullException(nameof(api));
 		return WrapperCallsExecutor.Execute(

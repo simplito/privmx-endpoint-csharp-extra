@@ -7,6 +7,7 @@
 
 using PrivMX.Endpoint.Core.Models;
 using PrivMX.Endpoint.Store.Models;
+using PrivmxEndpointCsharpExtra.Abstractions;
 using PrivmxEndpointCsharpExtra.Events;
 using PrivmxEndpointCsharpExtra.Store;
 using File = PrivMX.Endpoint.Store.Models.File;
@@ -59,9 +60,9 @@ public interface IAsyncStoreApi
 
 	public ValueTask<PagingList<File>> ListFiles(string storeId, PagingQuery pagingQuery,
 		CancellationToken token = default);
-	ValueTask<StoreWriteFileStream> CreateFile(string storeId, long size, byte[] publicMeta, byte[] privateMeta, byte? fillValue = null, CancellationToken token = default);
-	ValueTask<StoreWriteFileStream> OpenFileForWrite(string fileId, long size, byte[] publicMeta, byte[] privateMeta, byte? fillValue = null, CancellationToken token = default);
-	ValueTask<StoreReadonlyFileStream> OpenFileForRead(string fileId, CancellationToken token = default);
+	ValueTask<PrivmxFileStream> CreateFile(string storeId, long size, byte[] publicMeta, byte[] privateMeta, byte? fillValue = null, CancellationToken token = default);
+	ValueTask<PrivmxFileStream> OpenFileForWrite(string fileId, long size, byte[] publicMeta, byte[] privateMeta, byte? fillValue = null, CancellationToken token = default);
+	ValueTask<PrivmxFileStream> OpenFileForRead(string fileId, CancellationToken token = default);
 	ValueTask UpdateFileMetaAsync(string fileId, byte[] publicMeta, byte[] privateMeta, CancellationToken token = default);
 	public IObservable<StoreEvent> GetStoreEvents();
 	public IObservable<StoreFileEvent> GetFileEvents(string storeId);

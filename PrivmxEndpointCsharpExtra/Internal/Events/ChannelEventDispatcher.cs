@@ -32,9 +32,16 @@ internal abstract class ChannelEventDispatcher<T>(
 		if (!_disposed.PerformDispose())
 			return;
 		Logger.Log(LogLevel.Trace, "Disposing, channel: {0}, connectionId: {1}", channelName, connectioId);
-		WrappedInvokeObservable?.Dispose();
-		WrappedInvokeObservable = null!;
-		if (Interlocked.Exchange(ref _subscribersCount, 0) != 0) HandleAllSubscribersLost();
+		try
+		{
+			WrappedInvokeObservable?.Dispose();
+			WrappedInvokeObservable = null!;
+		}
+		finally
+		{
+			if (Interlocked.Exchange(ref _subscribersCount, 0) != 0) 
+				HandleAllSubscribersLost();
+		}
 	}
 
 	IDisposable IObservable<T>.Subscribe(IObserver<T> observer)

@@ -27,7 +27,7 @@ public static class ThreadApiAsyncExtensions
 
 	public static ValueTask UpdateThreadAsync(this IThreadApi threadApi, string threadId,
 		List<UserWithPubKey> users, List<UserWithPubKey> managers, byte[] publicMeta, byte[] privateMeta,
-		long version, bool force, bool forceGenerateNewKey, ContainerPolicy containerPolicy = null,
+		long version, bool force, bool forceGenerateNewKey, ContainerPolicy? containerPolicy = null,
 		CancellationToken token = default)
 	{
 		if (threadApi is null) throw new ArgumentNullException(nameof(threadApi));

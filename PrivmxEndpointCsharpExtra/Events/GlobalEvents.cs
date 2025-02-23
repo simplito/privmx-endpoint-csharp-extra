@@ -15,22 +15,15 @@ namespace PrivmxEndpointCsharpExtra.Events;
 
 public class GlobalEvents : IDisposable
 {
-	public enum Scope
-	{
-		AllEvents,
-		AllEventsForSpecificConnection,
-		AllEventsForSpecificChannel
-	}
 
 	private readonly NonExistingChannelDispatcher _channelDispatcher;
 	private readonly IEventDispatcher _eventDispatcher;
 	private DisposeBool _disposed;
-	private Scope _scope;
 
 	public GlobalEvents(string channel = PrivMXEventDispatcher.WildcardChannel, long connectionId = 0)
 
 	{
-		_eventDispatcher = PrivMXEventDispatcher.GetDispatcher();
+		_eventDispatcher = PrivMXEventDispatcher.Instance;
 		_channelDispatcher = new NonExistingChannelDispatcher(_eventDispatcher);
 	}
 
@@ -56,8 +49,6 @@ public class GlobalEvents : IDisposable
 
 	private class NonExistingChannelDispatcher : ChannelEventDispatcher<Event>
 	{
-		private static readonly Logger.SourcedLogger<NonExistingChannelDispatcher> Logger = default;
-
 		public NonExistingChannelDispatcher(IEventDispatcher eventDispatcher) : base(
 			PrivMXEventDispatcher.WildcardChannel, 0, eventDispatcher)
 		{
