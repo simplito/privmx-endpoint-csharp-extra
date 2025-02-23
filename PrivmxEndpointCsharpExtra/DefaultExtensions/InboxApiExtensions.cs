@@ -14,7 +14,7 @@ namespace PrivmxEndpointCsharpExtra;
 
 public static class InboxApiExtensions
 {
-	public static ValueTask<Inbox> GetInboxAsync(this IInboxApi inboxApi, string inboxId,
+	public static ValueTask<PrivMX.Endpoint.Inbox.Models.Inbox> GetInboxAsync(this IInboxApi inboxApi, string inboxId,
 		CancellationToken token = default)
 	{
 		if (inboxApi is null)
@@ -46,7 +46,7 @@ public static class InboxApiExtensions
 				forceGenerateNewKey, policies), token);
 	}
 
-	public static ValueTask<PagingList<Inbox>> ListInboxesAsync(this IInboxApi inboxApi, string contextId,
+	public static ValueTask<PagingList<PrivMX.Endpoint.Inbox.Models.Inbox>> ListInboxesAsync(this IInboxApi inboxApi, string contextId,
 		PagingQuery pagingQuery, CancellationToken token = default)
 	{
 		if (inboxApi is null)
