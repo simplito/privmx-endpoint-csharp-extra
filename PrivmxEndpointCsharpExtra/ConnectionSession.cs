@@ -26,16 +26,17 @@ public sealed class ConnectionSession : IAsyncDisposable
 	private readonly AsyncConnection _connection;
 	private readonly AsyncStoreApi _storeApi;
 	private readonly AsyncThreadApi _threadApi;
-	private readonly AsyncInboxApi _inboxApi;
+	// private readonly AsyncInboxApi _inboxApi;
 	private DisposeBool _disposed;
 
 	private ConnectionSession(string publicKey, string privateKey, AsyncConnection connection, AsyncThreadApi threadApi,
-		AsyncStoreApi storeApi, AsyncInboxApi inboxApi)
+		AsyncStoreApi storeApi//, AsyncInboxApi inboxApi
+		)
 	{
 		_connection = connection;
 		_threadApi = threadApi;
 		_storeApi = storeApi;
-		_inboxApi = inboxApi;
+		//_inboxApi = inboxApi;
 		PublicKey = publicKey;
 		PrivateKey = privateKey;
 	}
@@ -59,8 +60,8 @@ public sealed class ConnectionSession : IAsyncDisposable
 	public IAsyncStoreApi StoreApi =>
 		_disposed ? throw new ObjectDisposedException(nameof(ConnectionSession)) : _storeApi;
 
-	public IAsyncInboxApi InboxApi =>
-		_disposed ? throw new ObjectDisposedException(nameof(ConnectionSession)) : _inboxApi;
+	// public IAsyncInboxApi InboxApi =>
+	// 	_disposed ? throw new ObjectDisposedException(nameof(ConnectionSession)) : _inboxApi;
 
 	[SuppressMessage("Reliability", "CA2012")]
 	public async ValueTask DisposeAsync()
@@ -69,7 +70,8 @@ public sealed class ConnectionSession : IAsyncDisposable
 			return;
 		try
 		{
-			await ValueTaskTools.WhenAll(_connection.DisposeAsync(), _threadApi.DisposeAsync(), _storeApi.DisposeAsync(), _inboxApi.DisposeAsync());
+			await ValueTaskTools.WhenAll(_connection.DisposeAsync(), _threadApi.DisposeAsync()//, _storeApi.DisposeAsync(), _inboxApi.DisposeAsync()
+			);
 		}
 		catch (Exception e)
 		{
@@ -102,8 +104,9 @@ public sealed class ConnectionSession : IAsyncDisposable
 		var eventDispatcher = PrivMXEventDispatcher.Instance;
 		var asyncThreadApi = new AsyncThreadApi(threadApi, connectionId, eventDispatcher);
 		var asyncStoreApi = new AsyncStoreApi(storeApi, connectionId, eventDispatcher);
-		var asyncInboxApi = new AsyncInboxApi(inboxApi, connectionId, eventDispatcher);
-		return new ConnectionSession(publicKey, privateKey, asyncConnection, asyncThreadApi, asyncStoreApi, asyncInboxApi);
+		// var asyncInboxApi = new AsyncInboxApi(inboxApi, connectionId, eventDispatcher);
+		return new ConnectionSession(publicKey, privateKey, asyncConnection, asyncThreadApi, asyncStoreApi//, asyncInboxApi
+		);
 	}                                                                   
 
 

@@ -43,8 +43,8 @@ internal class Program
 				       Console.WriteLine(
 					       $"GlobalObserver - Channel: {ev.Channel}, Type: {ev.Type}, Instance id: {ev.ConnectionId}")))
 		{
-			// await TestStore.Test();
-			await TestInbox.Test();
+			await TestStore.Test();
+			// await TestInbox.Test();
 			// var origConnection =
 			// 	await ConnectionAsyncExtensions.ConnectAsync(privateKey, solutionId, "http://localhost:9111");
 			// await using var connection = new AsyncConnection(origConnection);
