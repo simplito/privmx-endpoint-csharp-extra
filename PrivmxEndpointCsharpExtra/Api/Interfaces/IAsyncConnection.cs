@@ -11,6 +11,7 @@ namespace PrivmxEndpointCsharpExtra.Api;
 
 public interface IAsyncConnection
 {
+	public long GetConnectionId();
 	/// <inheritdoc cref="PrivMX.Endpoint.Core.Connection.ListContexts" />
 	/// <param name="token">Cancellation token</param>
 	ValueTask<PagingList<Context>> ListContexts(

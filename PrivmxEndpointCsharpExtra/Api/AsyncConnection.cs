@@ -34,6 +34,12 @@ public sealed class AsyncConnection : IAsyncDisposable, IAsyncConnection
 
 	private IConnection Connection { get; }
 
+	public long GetConnectionId()
+	{
+		_disposeBool.ThrowIfDisposed(nameof(AsyncConnection));
+		return Connection.GetConnectionId();
+	}
+
 	/// <inheritdoc cref="PrivMX.Endpoint.Core.Connection.ListContexts" />
 	/// <param name="token">Cancellation token</param>
 	public ValueTask<PagingList<Context>> ListContexts(
