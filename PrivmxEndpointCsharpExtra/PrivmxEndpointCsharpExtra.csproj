@@ -5,10 +5,28 @@
         <LangVersion>default</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <Version>0.0.1</Version>
+        <Title>Privmx Endpoint Extra</Title>
+        <PackageName>Privmx Endpoint Extra</PackageName>
+        <Authors>Mateusz Chojnowski</Authors>
+        <PackageProjectUrl>https://privmx.dev/</PackageProjectUrl>
+        <Company>Simplito sp. z o.o.</Company>
+        <NeutralLanguage>en-US</NeutralLanguage>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <RepositoryUrl>https://github.com/simplito/privmx-endpoint-csharp</RepositoryUrl>
+        <PackageTags>PrivMX</PackageTags>
+        <PackageReadmeFile>Readme.md</PackageReadmeFile>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="PrivmxEndpointCsharp" Version="2.1.1" PrivateAssets="all"/>
+        <None Include="../LICENSE" Pack="true" PackagePath=""/>
+        <None Include="Readme.md" Pack="true" PackagePath="\Readme.md"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="PrivmxEndpointCsharp" Version="2.1.1"/>
     </ItemGroup>
 
     <ItemGroup>
