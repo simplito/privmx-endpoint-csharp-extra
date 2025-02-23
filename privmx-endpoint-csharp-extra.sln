@@ -2,6 +2,12 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrivmxEndpointCsharpExtra", "PrivmxEndpointCsharpExtra\PrivmxEndpointCsharpExtra.csproj", "{A8904230-4DCD-458D-982C-83A47925B92E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InternalTools", "InternalTools\InternalTools.csproj", "{5073E514-C4C7-4C59-883E-9BAB4B79A976}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnionSourceGenerator", "UnionSourceGenerator\UnionSourceGenerator.csproj", "{2E04F0B8-1C01-4A9E-BF69-FBFDA5EC5EEC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Consumer", "Consumer\Consumer.csproj", "{DB95000F-BAC3-4F8A-B366-099C96800B89}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +18,17 @@ Global
 		{A8904230-4DCD-458D-982C-83A47925B92E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A8904230-4DCD-458D-982C-83A47925B92E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A8904230-4DCD-458D-982C-83A47925B92E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5073E514-C4C7-4C59-883E-9BAB4B79A976}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5073E514-C4C7-4C59-883E-9BAB4B79A976}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5073E514-C4C7-4C59-883E-9BAB4B79A976}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5073E514-C4C7-4C59-883E-9BAB4B79A976}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E04F0B8-1C01-4A9E-BF69-FBFDA5EC5EEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E04F0B8-1C01-4A9E-BF69-FBFDA5EC5EEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E04F0B8-1C01-4A9E-BF69-FBFDA5EC5EEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E04F0B8-1C01-4A9E-BF69-FBFDA5EC5EEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB95000F-BAC3-4F8A-B366-099C96800B89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB95000F-BAC3-4F8A-B366-099C96800B89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB95000F-BAC3-4F8A-B366-099C96800B89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB95000F-BAC3-4F8A-B366-099C96800B89}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
