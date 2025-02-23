@@ -6,10 +6,24 @@
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
 
 namespace PrivmxEndpointCsharpExtra.Abstractions;
-
+/// <summary>
+/// Abstract class representing a Privmx file stream.
+/// </summary>
 public abstract class PrivmxFileStream : Stream
 {
-	public abstract string? FileId { get; } 
-	public abstract ReadOnlySpan<byte> PublicMeta { get; }
-	public abstract ReadOnlySpan<byte> PrivateMeta { get; }
+    /// <summary>
+    /// Gets the file identifier.
+    /// FileId may be null if the file is not yet uploaded.
+    /// </summary>
+    public abstract string? FileId { get; }
+
+    /// <summary>
+    /// Gets the public metadata.
+    /// </summary>
+    public abstract ReadOnlySpan<byte> PublicMeta { get; }
+
+    /// <summary>
+    /// Gets the private metadata.
+    /// </summary>
+    public abstract ReadOnlySpan<byte> PrivateMeta { get; }
 }

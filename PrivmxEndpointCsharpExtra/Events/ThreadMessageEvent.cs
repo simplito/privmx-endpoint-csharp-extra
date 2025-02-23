@@ -9,5 +9,7 @@ using Internal.Unions;
 using PrivMX.Endpoint.Thread.Models;
 
 namespace PrivmxEndpointCsharpExtra.Events;
-
+/// <summary>
+/// Union of multiple thread message events.
+/// </summary>
 public readonly partial struct ThreadMessageEvent : IUnion<ThreadNewMessageEvent, ThreadMessageDeletedEvent>;

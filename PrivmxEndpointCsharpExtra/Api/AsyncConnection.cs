@@ -9,6 +9,7 @@ using System.ComponentModel;
 using Internal;
 using PrivMX.Endpoint.Core;
 using PrivMX.Endpoint.Core.Models;
+using PrivmxEndpointCsharpExtra.Api.Interfaces;
 using PrivmxEndpointCsharpExtra.Internals;
 
 namespace PrivmxEndpointCsharpExtra.Api;

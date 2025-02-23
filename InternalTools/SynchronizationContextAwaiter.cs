@@ -13,7 +13,7 @@ namespace Internal;
 
 public readonly struct SynchronizationContextAwaiter : INotifyCompletion
 {
-	private static readonly SendOrPostCallback PostCallback = state => ((Action)state)();
+	private static readonly SendOrPostCallback PostCallback = state => ((Action)state!)();
 
 	private readonly SynchronizationContext _context;
 

@@ -10,5 +10,7 @@ using PrivMX.Endpoint.Store.Models;
 using PrivMX.Endpoint.Thread.Models;
 
 namespace PrivmxEndpointCsharpExtra.Events;
-
+/// <summary>
+/// Union of multiple store file events.
+/// </summary>
 public partial struct StoreFileEvent : IUnion<StoreFileCreatedEvent, StoreFileUpdatedEvent, StoreFileDeletedEvent>;

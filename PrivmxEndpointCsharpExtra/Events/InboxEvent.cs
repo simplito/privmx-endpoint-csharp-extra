@@ -9,5 +9,7 @@ using Internal.Unions;
 using PrivMX.Endpoint.Inbox.Models;
 
 namespace PrivmxEndpointCsharpExtra.Events;
-
+/// <summary>
+/// Union of multiple inbox events.
+/// </summary>
 public partial struct InboxEvent : IUnion<InboxCreatedEvent, InboxUpdatedEvent, InboxDeletedEvent>;

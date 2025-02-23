@@ -54,7 +54,9 @@ public class AsyncStoreApi : IAsyncDisposable, IDisposable, IAsyncStoreApi
 	/// </summary>
 	/// <param name="connection"></param>
 	public AsyncStoreApi(Connection connection) : this(StoreApi.Create(connection), connection.GetConnectionId(), PrivMXEventDispatcher.Instance) { }
-
+	/// <summary>
+	/// Disposes store api.
+	/// </summary>
 	public ValueTask DisposeAsync()
 	{
 		Dispose();
@@ -123,18 +125,36 @@ public class AsyncStoreApi : IAsyncDisposable, IDisposable, IAsyncStoreApi
 		return _storeApi.DeleteStoreAsync(storeId, token);
 	}
 
+	/// <summary>
+	/// Gets a single Store by given Store ID.
+	/// </summary>
+	/// <param name="storeId">ID of the store to get.</param>
+	/// <param name="token">Cancellation token.</param>
+	/// <returns>Information about about the Store.</returns>
 	public ValueTask<PrivMX.Endpoint.Store.Models.Store> GetStore(string storeId, CancellationToken token = default)
 	{
 		_disposed.ThrowIfDisposed(nameof(AsyncStoreApi));
 		return _storeApi.GetStoreAsync(storeId, token);
 	}
-
+	/// <summary>
+	/// Gets information about existing file.
+	/// </summary>
+	/// <param name="fileId">ID of the file to get.</param>
+	/// <param name="token">Cancellation token.</param>
+	/// <returns>Store file metadata.</returns>
 	public ValueTask<File> GetFile(string fileId, CancellationToken token = default)
 	{
 		_disposed.ThrowIfDisposed(nameof(AsyncStoreApi));
 		return _storeApi.GetFileAsync(fileId, token);
 	}
 
+	/// <summary>
+	/// Gets a list of Stores in given Context.
+	/// </summary>
+	/// <param name="contextId">ID of the Context to get the Stores from.</param>
+	/// <param name="pagingQuery">List query parameters.</param>
+	/// <param name="token">Cancellation token.</param>
+	/// <returns>List of Stores.</returns>
 	public ValueTask<PagingList<PrivMX.Endpoint.Store.Models.Store>> ListStores(string contextId,
 		PagingQuery pagingQuery, CancellationToken token = default)
 	{
@@ -149,6 +169,16 @@ public class AsyncStoreApi : IAsyncDisposable, IDisposable, IAsyncStoreApi
 		return _storeApi.ListFilesAsync(storeId, pagingQuery, token);
 	}
 
+	/// <summary>
+	/// Creates a new file in a Store.
+	/// </summary>
+	/// <param name="storeId">ID of the Store to create the file in.</param>
+	/// <param name="publicMeta">Public file meta_data.</param>
+	/// <param name="privateMeta">Private file meta_data.</param>
+	/// <param name="size">Size of the file.</param>
+	/// <param name="fillValue">Optional value to fill empty space in file stream on close.</param>
+	/// <param name="token">Cancellation token.</param>
+	/// <returns>Fixed size file stream that supports write operations.</returns>
 	public async ValueTask<PrivmxFileStream> CreateFile(string storeId, long size, byte[] publicMeta, byte[] privateMeta, byte? fillValue = null, CancellationToken token = default)
 	{
 		_disposed.ThrowIfDisposed(nameof(AsyncStoreApi));
@@ -156,7 +186,16 @@ public class AsyncStoreApi : IAsyncDisposable, IDisposable, IAsyncStoreApi
 		var handle = await _storeApi.CreateFileAsync(storeId, publicMeta, privateMeta, size, token);
 		return new StoreWriteFileStream(null, handle, size, publicMeta, privateMeta, fillValue, _storeApi);
 	}
-
+	/// <summary>
+	/// Opens a file for write.
+	/// </summary>
+	/// <param name="fileId">ID of the file to update.</param>
+	/// <param name="size">New file size.</param>
+	/// <param name="publicMeta">Public file meta data.></param>
+	/// <param name="privateMeta">Private file meta data.</param>
+	/// <param name="fillValue">Optional value to fill empty space in file stream on close.</param>
+	/// <param name="token">Cancellation token</param>
+	/// <returns>Fixed size file stream that supports write operations.</returns>
 	public async ValueTask<PrivmxFileStream> OpenFileForWrite(string fileId, long size, byte[] publicMeta, byte[] privateMeta, byte? fillValue = null,
 		CancellationToken token = default)
 	{
@@ -165,7 +204,12 @@ public class AsyncStoreApi : IAsyncDisposable, IDisposable, IAsyncStoreApi
 		var handle = await _storeApi.UpdateFileAsync(fileId, publicMeta, privateMeta, size, token);
 		return new StoreWriteFileStream(fileId, handle, size, publicMeta, privateMeta, fillValue, _storeApi);
 	}
-
+	 /// <summary>
+	 /// Opens a file for read.
+	 /// </summary>
+	 /// <param name="fileId">ID of the file to read.</param>
+	 /// <param name="token">Cancellation token</param>
+	 /// <returns>Fixed size readable stream that supports seek operation.</returns>
 	public async ValueTask<PrivmxFileStream> OpenFileForRead(string fileId, CancellationToken token = default)
 	{
 		_disposed.ThrowIfDisposed(nameof(AsyncStoreApi));
@@ -176,6 +220,13 @@ public class AsyncStoreApi : IAsyncDisposable, IDisposable, IAsyncStoreApi
 			meta.Result.PublicMeta, meta.Result.PrivateMeta);
 	}
 
+	/// <summary>
+	/// Updates meta data of an existing file in a Store.
+	/// </summary>
+	/// <param name="fileId">ID of the file to update.</param>
+	/// <param name="publicMeta">Public file meta_data.</param>
+	/// <param name="privateMeta">Private file meta_data.</param>
+	/// <param name="token">Cancellation token.</param>
 	public ValueTask UpdateFileMetaAsync(string fileId, byte[] publicMeta, byte[] privateMeta,
 		CancellationToken token = default)
 	{
@@ -206,13 +257,20 @@ public class AsyncStoreApi : IAsyncDisposable, IDisposable, IAsyncStoreApi
 			throw exception;
 		}
 	}
-
+	/// <summary>
+	/// Gets store events.
+	/// </summary>
+	/// <returns>Stream of store events.</returns>
 	public IObservable<StoreEvent> GetStoreEvents()
 	{
 		_disposed.ThrowIfDisposed(nameof(AsyncStoreApi));
 		return _storeChannelEventDispatcher;
 	}
-
+	/// <summary>
+	/// Gets store file events.
+	/// </summary>
+	/// <param name="storeId">ID of the tracked store.</param>
+	/// <returns>Stream of store file events.</returns>
 	public IObservable<StoreFileEvent> GetFileEvents(string storeId)
 	{
 		_disposed.ThrowIfDisposed(nameof(AsyncStoreApi));

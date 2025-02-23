@@ -13,34 +13,46 @@ using PrivmxEndpointCsharpExtra.Internals;
 
 namespace PrivmxEndpointCsharpExtra.Events;
 
+/// <summary>
+/// Represents global events in the PrivMX platform.
+/// </summary>
 public class GlobalEvents : IDisposable
 {
 
 	private readonly NonExistingChannelDispatcher _channelDispatcher;
-	private readonly IEventDispatcher _eventDispatcher;
 	private DisposeBool _disposed;
-
-	public GlobalEvents(string channel = PrivMXEventDispatcher.WildcardChannel, long connectionId = 0)
+	/// <summary>
+	/// Initializes a new instance of the <see cref="GlobalEvents"/> class.
+	/// </summary>
+	public GlobalEvents()
 
 	{
-		_eventDispatcher = PrivMXEventDispatcher.Instance;
-		_channelDispatcher = new NonExistingChannelDispatcher(_eventDispatcher);
+		IEventDispatcher eventDispatcher = PrivMXEventDispatcher.Instance;
+		_channelDispatcher = new NonExistingChannelDispatcher(eventDispatcher);
 	}
 
+	/// <summary>
+	/// Initializes a new instance of the <see cref="GlobalEvents"/> class with a specified event dispatcher.
+	/// </summary>
+	/// <param name="eventDispatcher">The event dispatcher to use.</param>
 	[EditorBrowsable(EditorBrowsableState.Advanced)]
 	public GlobalEvents(IEventDispatcher eventDispatcher)
 	{
-		_eventDispatcher = eventDispatcher;
-		_channelDispatcher = new NonExistingChannelDispatcher(_eventDispatcher);
+		_channelDispatcher = new NonExistingChannelDispatcher(eventDispatcher);
 	}
-
+	/// <summary>
+	/// Disposes the resources used by the <see cref="GlobalEvents"/> class.
+	/// </summary>
 	public void Dispose()
 	{
 		if (!_disposed.PerformDispose())
 			return;
 		_channelDispatcher.Dispose();
 	}
-
+	/// <summary>
+	/// Gets an observable stream of all events.
+	/// </summary>
+	/// <returns>An observable stream of <see cref="Event"/>.</returns>
 	public IObservable<Event> AllEvents()
 	{
 		_disposed.ThrowIfDisposed(nameof(GlobalEvents));
@@ -59,9 +71,11 @@ public class GlobalEvents : IDisposable
 			WrappedInvokeObservable.Send(@event);
 		}
 
+
 		protected override void OpenChanel()
 		{
 		}
+
 
 		protected override void CloseChanel()
 		{
