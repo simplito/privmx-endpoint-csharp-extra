@@ -1,6 +1,6 @@
 ﻿// Module name: PrivmxEndpointCsharpExtra
 // File name: StoreWriteFileStream.cs
-// Last edit: 2025-02-19 22:02 by Mateusz Chojnowski mchojnowsk@simplito.com
+// Last edit: 2025-02-23 23:02 by Mateusz Chojnowski mchojnowsk@simplito.com
 // Copyright (c) Simplito sp. z o.o.
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
@@ -11,37 +11,35 @@ using PrivmxEndpointCsharpExtra.Abstractions;
 using PrivmxEndpointCsharpExtra.Internals;
 
 namespace PrivmxEndpointCsharpExtra.Store;
+
 /// <summary>
-/// Stream that represents remote file in the store.
-/// All data is written to the store when file is closed/disposed.
-/// This class is not thread safe.
+///     Stream that represents remote file in the store.
+///     All data is written to the store when file is closed/disposed.
+///     This class is not thread safe.
 /// </summary>
 internal sealed class StoreWriteFileStream : PrivmxFileStream
 {
 	private static readonly Logger.SourcedLogger<StoreWriteFileStream> Logger = default;
-	private DisposeBool _disposed = new();
-	private IStoreApi _storeApi;
 	private readonly long _fileHandle;
-	private long _position;
-	private readonly byte? _fillValue = null;
-	private string? _fileId;
-	private readonly byte[] _publicMeta;
+	private readonly byte? _fillValue;
 	private readonly byte[] _privateMeta;
-	public override string? FileId => _fileId;
-
-	public override ReadOnlySpan<byte> PublicMeta => _publicMeta;
-
-	public override ReadOnlySpan<byte> PrivateMeta => _privateMeta;
+	private readonly byte[] _publicMeta;
+	private DisposeBool _disposed;
+	private string? _fileId;
+	private long _position;
+	private IStoreApi _storeApi;
 
 	/// <summary>
-	/// File ID. May be null if file is not yet created.
-	/// May change after object disposal when the file is closed and saved on the server.
+	///     File ID. May be null if file is not yet created.
+	///     May change after object disposal when the file is closed and saved on the server.
 	/// </summary>
-	internal StoreWriteFileStream(string? fileId, long fileHandle, long size, byte[] publicMeta, byte[] privateMeta, byte? fillValue, IStoreApi storeApi)
+	internal StoreWriteFileStream(string? fileId, long fileHandle, long size, byte[] publicMeta, byte[] privateMeta,
+		byte? fillValue, IStoreApi storeApi)
 	{
-		Logger.Log(LogLevel.Trace, "Creating new StoreWriteFileStream, handle: {0}, fileId: {1}, fileLength: {2}", fileId, fileId, size);
+		Logger.Log(LogLevel.Trace, "Creating new StoreWriteFileStream, handle: {0}, fileId: {1}, fileLength: {2}",
+			fileId, fileId, size);
 		_fileHandle = fileHandle;
-			_fileId= fileId;
+		_fileId = fileId;
 		Length = size;
 		_storeApi = storeApi;
 		_fillValue = fillValue;
@@ -49,9 +47,25 @@ internal sealed class StoreWriteFileStream : PrivmxFileStream
 		_privateMeta = privateMeta;
 	}
 
+	public override string? FileId => _fileId;
+
+	public override ReadOnlySpan<byte> PublicMeta => _publicMeta;
+
+	public override ReadOnlySpan<byte> PrivateMeta => _privateMeta;
+
+	public override bool CanRead => false;
+	public override bool CanSeek => false;
+	public override bool CanWrite => !_disposed;
+	public override long Length { get; }
+
+	public override long Position
+	{
+		get => _position;
+		set => throw new NotSupportedException($"{nameof(StoreWriteFileStream)} is not seekable.");
+	}
+
 	public override void Flush()
 	{
-		
 	}
 
 	public override int Read(byte[] buffer, int offset, int count)
@@ -92,8 +106,8 @@ internal sealed class StoreWriteFileStream : PrivmxFileStream
 	}
 
 	protected override void Dispose(bool disposing)
-	{          
-		if(!_disposed.PerformDispose())
+	{
+		if (!_disposed.PerformDispose())
 			return;
 		try
 		{
@@ -112,12 +126,13 @@ internal sealed class StoreWriteFileStream : PrivmxFileStream
 		{
 			_storeApi = null!;
 		}
+
 		base.Dispose(disposing);
 	}
-	
+
 	public override async ValueTask DisposeAsync()
 	{
-		if(!_disposed.PerformDispose())
+		if (!_disposed.PerformDispose())
 			return;
 		try
 		{
@@ -134,16 +149,5 @@ internal sealed class StoreWriteFileStream : PrivmxFileStream
 		{
 			_storeApi = null!;
 		}
-	}
-
-	public override bool CanRead => false;
-	public override bool CanSeek => false;
-	public override bool CanWrite => !_disposed;
-	public override long Length { get; }
-
-	public override long Position
-	{
-		get => _position;
-		set => throw new NotSupportedException($"{nameof(StoreWriteFileStream)} is not seekable.");
 	}
 }

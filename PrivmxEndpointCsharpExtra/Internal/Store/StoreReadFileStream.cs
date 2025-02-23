@@ -1,6 +1,6 @@
 ﻿// Module name: PrivmxEndpointCsharpExtra
-// File name: StoreReadonlyFileStream.cs
-// Last edit: 2025-02-19 23:02 by Mateusz Chojnowski mchojnowsk@simplito.com
+// File name: StoreReadFileStream.cs
+// Last edit: 2025-02-23 23:02 by Mateusz Chojnowski mchojnowsk@simplito.com
 // Copyright (c) Simplito sp. z o.o.
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
@@ -20,10 +20,11 @@ internal sealed class StoreReadonlyFileStream : PrivmxFileStream
 {
 	private static readonly Logger.SourcedLogger<StoreReadonlyFileStream> Logger = default;
 	private readonly long _fileHandle;
+	private readonly byte[] _publicMeta;
 	private DisposeBool _disposed;
 	private long _position;
+	private byte[] _privateMeta;
 	private IStoreApi _storeApi;
-	private byte[] _publicMeta, _privateMeta;
 
 	internal StoreReadonlyFileStream(string fileId, long size, long fileHandle, IStoreApi storeApi, byte[] publicMeta,
 		byte[] privateMeta)
@@ -46,6 +47,10 @@ internal sealed class StoreReadonlyFileStream : PrivmxFileStream
 		get => _position;
 		set => SetPosition(value);
 	}
+
+	public override string? FileId { get; }
+	public override ReadOnlySpan<byte> PublicMeta => _publicMeta;
+	public override ReadOnlySpan<byte> PrivateMeta => _publicMeta;
 
 	public override void Flush()
 	{
@@ -138,8 +143,4 @@ internal sealed class StoreReadonlyFileStream : PrivmxFileStream
 			_storeApi = null!;
 		}
 	}
-
-	public override string? FileId { get; }
-	public override ReadOnlySpan<byte> PublicMeta => _publicMeta;
-	public override ReadOnlySpan<byte> PrivateMeta => _publicMeta;
 }

@@ -1,6 +1,6 @@
 ﻿// Module name: PrivmxEndpointCsharpExtra
 // File name: ChannelEventDispatcher.cs
-// Last edit: 2025-02-19 23:02 by Mateusz Chojnowski mchojnowsk@simplito.com
+// Last edit: 2025-02-23 23:02 by Mateusz Chojnowski mchojnowsk@simplito.com
 // Copyright (c) Simplito sp. z o.o.
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
@@ -39,7 +39,7 @@ internal abstract class ChannelEventDispatcher<T>(
 		}
 		finally
 		{
-			if (Interlocked.Exchange(ref _subscribersCount, 0) != 0) 
+			if (Interlocked.Exchange(ref _subscribersCount, 0) != 0)
 				HandleAllSubscribersLost();
 		}
 	}

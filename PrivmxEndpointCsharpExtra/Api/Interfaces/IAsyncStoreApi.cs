@@ -1,6 +1,6 @@
 ﻿// Module name: PrivmxEndpointCsharpExtra
 // File name: IAsyncStoreApi.cs
-// Last edit: 2025-02-23 22:02 by Mateusz Chojnowski mchojnowsk@simplito.com
+// Last edit: 2025-02-23 23:02 by Mateusz Chojnowski mchojnowsk@simplito.com
 // Copyright (c) Simplito sp. z o.o.
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
@@ -64,7 +64,7 @@ public interface IAsyncStoreApi
 	ValueTask DeleteStore(string storeId, CancellationToken token = default);
 
 	/// <summary>
-	/// Gets a single Store by given Store ID.
+	///     Gets a single Store by given Store ID.
 	/// </summary>
 	/// <param name="storeId">ID of the store to get.</param>
 	/// <param name="token">Cancellation token.</param>
@@ -72,7 +72,7 @@ public interface IAsyncStoreApi
 	ValueTask<PrivMX.Endpoint.Store.Models.Store> GetStore(string storeId, CancellationToken token = default);
 
 	/// <summary>
-	/// Gets information about existing file.
+	///     Gets information about existing file.
 	/// </summary>
 	/// <param name="fileId">ID of the file to get.</param>
 	/// <param name="token">Cancellation token.</param>
@@ -80,7 +80,7 @@ public interface IAsyncStoreApi
 	ValueTask<File> GetFile(string fileId, CancellationToken token = default);
 
 	/// <summary>
-	/// Gets a list of Stores in given Context.
+	///     Gets a list of Stores in given Context.
 	/// </summary>
 	/// <param name="contextId">ID of the Context to get the Stores from.</param>
 	/// <param name="pagingQuery">List query parameters.</param>
@@ -93,7 +93,7 @@ public interface IAsyncStoreApi
 		CancellationToken token = default);
 
 	/// <summary>
-	/// Creates a new file in a Store.
+	///     Creates a new file in a Store.
 	/// </summary>
 	/// <param name="storeId">ID of the Store to create the file in.</param>
 	/// <param name="publicMeta">Public file meta_data.</param>
@@ -102,10 +102,11 @@ public interface IAsyncStoreApi
 	/// <param name="fillValue">Optional value to fill empty space in file stream on close.</param>
 	/// <param name="token">Cancellation token.</param>
 	/// <returns>Fixed size file stream that supports write operations.</returns>
-	ValueTask<PrivmxFileStream> CreateFile(string storeId, long size, byte[] publicMeta, byte[] privateMeta, byte? fillValue = null, CancellationToken token = default);
+	ValueTask<PrivmxFileStream> CreateFile(string storeId, long size, byte[] publicMeta, byte[] privateMeta,
+		byte? fillValue = null, CancellationToken token = default);
 
 	/// <summary>
-	/// Opens a file for write.
+	///     Opens a file for write.
 	/// </summary>
 	/// <param name="fileId">ID of the file to update.</param>
 	/// <param name="size">New file size.</param>
@@ -114,11 +115,12 @@ public interface IAsyncStoreApi
 	/// <param name="fillValue">Optional value to fill empty space in file stream on close.</param>
 	/// <param name="token">Cancellation token</param>
 	/// <returns>Fixed size file stream that supports write operations.</returns>
-	ValueTask<PrivmxFileStream> OpenFileForWrite(string fileId, long size, byte[] publicMeta, byte[] privateMeta, byte? fillValue = null,
+	ValueTask<PrivmxFileStream> OpenFileForWrite(string fileId, long size, byte[] publicMeta, byte[] privateMeta,
+		byte? fillValue = null,
 		CancellationToken token = default);
 
 	/// <summary>
-	/// Opens a file for read.
+	///     Opens a file for read.
 	/// </summary>
 	/// <param name="fileId">ID of the file to read.</param>
 	/// <param name="token">Cancellation token</param>
@@ -126,7 +128,7 @@ public interface IAsyncStoreApi
 	ValueTask<PrivmxFileStream> OpenFileForRead(string fileId, CancellationToken token = default);
 
 	/// <summary>
-	/// Updates meta data of an existing file in a Store.
+	///     Updates meta data of an existing file in a Store.
 	/// </summary>
 	/// <param name="fileId">ID of the file to update.</param>
 	/// <param name="publicMeta">Public file meta_data.</param>
@@ -136,13 +138,13 @@ public interface IAsyncStoreApi
 		CancellationToken token = default);
 
 	/// <summary>
-	/// Gets store events.
+	///     Gets store events.
 	/// </summary>
 	/// <returns>Stream of store events.</returns>
 	IObservable<StoreEvent> GetStoreEvents();
 
 	/// <summary>
-	/// Gets store file events.
+	///     Gets store file events.
 	/// </summary>
 	/// <param name="storeId">ID of the tracked store.</param>
 	/// <returns>Stream of store file events.</returns>

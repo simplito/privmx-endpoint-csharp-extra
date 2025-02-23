@@ -1,6 +1,6 @@
 ﻿// Module name: PrivmxEndpointCsharpExtra
 // File name: ConnectionSession.cs
-// Last edit: 2025-02-19 23:02 by Mateusz Chojnowski mchojnowsk@simplito.com
+// Last edit: 2025-02-23 23:02 by Mateusz Chojnowski mchojnowsk@simplito.com
 // Copyright (c) Simplito sp. z o.o.
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
@@ -8,6 +8,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Internal;
 using PrivMX.Endpoint.Core;
+using PrivMX.Endpoint.Inbox;
 using PrivmxEndpointCsharpExtra.Api;
 using PrivmxEndpointCsharpExtra.Api.Interfaces;
 using PrivmxEndpointCsharpExtra.Events.Internal;
@@ -25,13 +26,15 @@ public sealed class ConnectionSession : IAsyncDisposable
 	private static readonly Logger.SourcedLogger<ConnectionSession> Logger = default;
 	private readonly AsyncConnection _connection;
 	private readonly AsyncStoreApi _storeApi;
+
 	private readonly AsyncThreadApi _threadApi;
+
 	// private readonly AsyncInboxApi _inboxApi;
 	private DisposeBool _disposed;
 
 	private ConnectionSession(string publicKey, string privateKey, AsyncConnection connection, AsyncThreadApi threadApi,
-		AsyncStoreApi storeApi//, AsyncInboxApi inboxApi
-		)
+		AsyncStoreApi storeApi //, AsyncInboxApi inboxApi
+	)
 	{
 		_connection = connection;
 		_threadApi = threadApi;
@@ -70,7 +73,8 @@ public sealed class ConnectionSession : IAsyncDisposable
 			return;
 		try
 		{
-			await ValueTaskTools.WhenAll(_connection.DisposeAsync(), _threadApi.DisposeAsync()//, _storeApi.DisposeAsync(), _inboxApi.DisposeAsync()
+			await ValueTaskTools.WhenAll(_connection.DisposeAsync(),
+				_threadApi.DisposeAsync() //, _storeApi.DisposeAsync(), _inboxApi.DisposeAsync()
 			);
 		}
 		catch (Exception e)
@@ -100,14 +104,13 @@ public sealed class ConnectionSession : IAsyncDisposable
 		var asyncConnection = new AsyncConnection(connection);
 		var threadApi = PrivMX.Endpoint.Thread.ThreadApi.Create(connection);
 		var storeApi = PrivMX.Endpoint.Store.StoreApi.Create(connection);
-		var inboxApi = PrivMX.Endpoint.Inbox.InboxApi.Create(connection, threadApi, storeApi);
+		var inboxApi = InboxApi.Create(connection, threadApi, storeApi);
 		var eventDispatcher = PrivMXEventDispatcher.Instance;
 		var asyncThreadApi = new AsyncThreadApi(threadApi, connectionId, eventDispatcher);
 		var asyncStoreApi = new AsyncStoreApi(storeApi, connectionId, eventDispatcher);
 		// var asyncInboxApi = new AsyncInboxApi(inboxApi, connectionId, eventDispatcher);
-		return new ConnectionSession(publicKey, privateKey, asyncConnection, asyncThreadApi, asyncStoreApi//, asyncInboxApi
+		return new ConnectionSession(publicKey, privateKey, asyncConnection, asyncThreadApi,
+			asyncStoreApi //, asyncInboxApi
 		);
-	}                                                                   
-
-
+	}
 }

@@ -1,6 +1,6 @@
 ﻿// Module name: PrivmxEndpointCsharpExtra
 // File name: AsyncStoreApi.cs
-// Last edit: 2025-02-19 23:02 by Mateusz Chojnowski mchojnowsk@simplito.com
+// Last edit: 2025-02-23 23:02 by Mateusz Chojnowski mchojnowsk@simplito.com
 // Copyright (c) Simplito sp. z o.o.
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
@@ -25,10 +25,10 @@ namespace PrivmxEndpointCsharpExtra.Api;
 public class AsyncStoreApi : IAsyncDisposable, IDisposable, IAsyncStoreApi
 {
 	private static readonly Logger.SourcedLogger<AsyncStoreApi> Logger = default;
-	private long _connectionId;
+	private readonly long _connectionId;
+	private readonly IEventDispatcher _eventDispatcher;
 	private DisposeBool _disposed;
 	private IStoreApi _storeApi;
-	private IEventDispatcher _eventDispatcher;
 	private StoreChannelEnventDispatcher _storeChannelEventDispatcher;
 	private Dictionary<string, StoreFileEventDispatcher> _storeFileDispatchers;
 
@@ -53,9 +53,13 @@ public class AsyncStoreApi : IAsyncDisposable, IDisposable, IAsyncStoreApi
 	///     Creates a new instance of the store api over real privmx connection.
 	/// </summary>
 	/// <param name="connection"></param>
-	public AsyncStoreApi(Connection connection) : this(StoreApi.Create(connection), connection.GetConnectionId(), PrivMXEventDispatcher.Instance) { }
+	public AsyncStoreApi(Connection connection) : this(StoreApi.Create(connection), connection.GetConnectionId(),
+		PrivMXEventDispatcher.Instance)
+	{
+	}
+
 	/// <summary>
-	/// Disposes store api.
+	///     Disposes store api.
 	/// </summary>
 	public ValueTask DisposeAsync()
 	{
@@ -126,7 +130,7 @@ public class AsyncStoreApi : IAsyncDisposable, IDisposable, IAsyncStoreApi
 	}
 
 	/// <summary>
-	/// Gets a single Store by given Store ID.
+	///     Gets a single Store by given Store ID.
 	/// </summary>
 	/// <param name="storeId">ID of the store to get.</param>
 	/// <param name="token">Cancellation token.</param>
@@ -136,8 +140,9 @@ public class AsyncStoreApi : IAsyncDisposable, IDisposable, IAsyncStoreApi
 		_disposed.ThrowIfDisposed(nameof(AsyncStoreApi));
 		return _storeApi.GetStoreAsync(storeId, token);
 	}
+
 	/// <summary>
-	/// Gets information about existing file.
+	///     Gets information about existing file.
 	/// </summary>
 	/// <param name="fileId">ID of the file to get.</param>
 	/// <param name="token">Cancellation token.</param>
@@ -149,7 +154,7 @@ public class AsyncStoreApi : IAsyncDisposable, IDisposable, IAsyncStoreApi
 	}
 
 	/// <summary>
-	/// Gets a list of Stores in given Context.
+	///     Gets a list of Stores in given Context.
 	/// </summary>
 	/// <param name="contextId">ID of the Context to get the Stores from.</param>
 	/// <param name="pagingQuery">List query parameters.</param>
@@ -170,7 +175,7 @@ public class AsyncStoreApi : IAsyncDisposable, IDisposable, IAsyncStoreApi
 	}
 
 	/// <summary>
-	/// Creates a new file in a Store.
+	///     Creates a new file in a Store.
 	/// </summary>
 	/// <param name="storeId">ID of the Store to create the file in.</param>
 	/// <param name="publicMeta">Public file meta_data.</param>
@@ -179,15 +184,17 @@ public class AsyncStoreApi : IAsyncDisposable, IDisposable, IAsyncStoreApi
 	/// <param name="fillValue">Optional value to fill empty space in file stream on close.</param>
 	/// <param name="token">Cancellation token.</param>
 	/// <returns>Fixed size file stream that supports write operations.</returns>
-	public async ValueTask<PrivmxFileStream> CreateFile(string storeId, long size, byte[] publicMeta, byte[] privateMeta, byte? fillValue = null, CancellationToken token = default)
+	public async ValueTask<PrivmxFileStream> CreateFile(string storeId, long size, byte[] publicMeta,
+		byte[] privateMeta, byte? fillValue = null, CancellationToken token = default)
 	{
 		_disposed.ThrowIfDisposed(nameof(AsyncStoreApi));
 		token.ThrowIfCancellationRequested();
 		var handle = await _storeApi.CreateFileAsync(storeId, publicMeta, privateMeta, size, token);
 		return new StoreWriteFileStream(null, handle, size, publicMeta, privateMeta, fillValue, _storeApi);
 	}
+
 	/// <summary>
-	/// Opens a file for write.
+	///     Opens a file for write.
 	/// </summary>
 	/// <param name="fileId">ID of the file to update.</param>
 	/// <param name="size">New file size.</param>
@@ -196,7 +203,8 @@ public class AsyncStoreApi : IAsyncDisposable, IDisposable, IAsyncStoreApi
 	/// <param name="fillValue">Optional value to fill empty space in file stream on close.</param>
 	/// <param name="token">Cancellation token</param>
 	/// <returns>Fixed size file stream that supports write operations.</returns>
-	public async ValueTask<PrivmxFileStream> OpenFileForWrite(string fileId, long size, byte[] publicMeta, byte[] privateMeta, byte? fillValue = null,
+	public async ValueTask<PrivmxFileStream> OpenFileForWrite(string fileId, long size, byte[] publicMeta,
+		byte[] privateMeta, byte? fillValue = null,
 		CancellationToken token = default)
 	{
 		_disposed.ThrowIfDisposed(nameof(AsyncStoreApi));
@@ -204,12 +212,13 @@ public class AsyncStoreApi : IAsyncDisposable, IDisposable, IAsyncStoreApi
 		var handle = await _storeApi.UpdateFileAsync(fileId, publicMeta, privateMeta, size, token);
 		return new StoreWriteFileStream(fileId, handle, size, publicMeta, privateMeta, fillValue, _storeApi);
 	}
-	 /// <summary>
-	 /// Opens a file for read.
-	 /// </summary>
-	 /// <param name="fileId">ID of the file to read.</param>
-	 /// <param name="token">Cancellation token</param>
-	 /// <returns>Fixed size readable stream that supports seek operation.</returns>
+
+	/// <summary>
+	///     Opens a file for read.
+	/// </summary>
+	/// <param name="fileId">ID of the file to read.</param>
+	/// <param name="token">Cancellation token</param>
+	/// <returns>Fixed size readable stream that supports seek operation.</returns>
 	public async ValueTask<PrivmxFileStream> OpenFileForRead(string fileId, CancellationToken token = default)
 	{
 		_disposed.ThrowIfDisposed(nameof(AsyncStoreApi));
@@ -221,7 +230,7 @@ public class AsyncStoreApi : IAsyncDisposable, IDisposable, IAsyncStoreApi
 	}
 
 	/// <summary>
-	/// Updates meta data of an existing file in a Store.
+	///     Updates meta data of an existing file in a Store.
 	/// </summary>
 	/// <param name="fileId">ID of the file to update.</param>
 	/// <param name="publicMeta">Public file meta_data.</param>
@@ -234,31 +243,8 @@ public class AsyncStoreApi : IAsyncDisposable, IDisposable, IAsyncStoreApi
 		return _storeApi.UpdateFileMetaAsync(fileId, publicMeta, privateMeta, token);
 	}
 
-	public void Dispose()
-	{
-		if(!_disposed.PerformDispose())
-			 return;
-		var exceptions = _storeFileDispatchers.Values.ForEachNotThrowing(dispatcher => dispatcher.Dispose());
-		_storeFileDispatchers = null!;
-		try
-		{
-			_storeChannelEventDispatcher.Dispose();
-		}
-		catch (Exception exception)
-		{
-			(exceptions ??= new List<Exception>()).Add(exception);
-		}
-
-		_storeChannelEventDispatcher = null!;
-		_storeApi = null!;
-		if (exceptions is not null)
-		{
-			var exception = new AggregateException(exceptions);
-			throw exception;
-		}
-	}
 	/// <summary>
-	/// Gets store events.
+	///     Gets store events.
 	/// </summary>
 	/// <returns>Stream of store events.</returns>
 	public IObservable<StoreEvent> GetStoreEvents()
@@ -266,8 +252,9 @@ public class AsyncStoreApi : IAsyncDisposable, IDisposable, IAsyncStoreApi
 		_disposed.ThrowIfDisposed(nameof(AsyncStoreApi));
 		return _storeChannelEventDispatcher;
 	}
+
 	/// <summary>
-	/// Gets store file events.
+	///     Gets store file events.
 	/// </summary>
 	/// <param name="storeId">ID of the tracked store.</param>
 	/// <returns>Stream of store file events.</returns>
@@ -285,6 +272,30 @@ public class AsyncStoreApi : IAsyncDisposable, IDisposable, IAsyncStoreApi
 			}
 
 			return dispatcher;
+		}
+	}
+
+	public void Dispose()
+	{
+		if (!_disposed.PerformDispose())
+			return;
+		var exceptions = _storeFileDispatchers.Values.ForEachNotThrowing(dispatcher => dispatcher.Dispose());
+		_storeFileDispatchers = null!;
+		try
+		{
+			_storeChannelEventDispatcher.Dispose();
+		}
+		catch (Exception exception)
+		{
+			(exceptions ??= new List<Exception>()).Add(exception);
+		}
+
+		_storeChannelEventDispatcher = null!;
+		_storeApi = null!;
+		if (exceptions is not null)
+		{
+			var exception = new AggregateException(exceptions);
+			throw exception;
 		}
 	}
 
