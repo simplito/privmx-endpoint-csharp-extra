@@ -6,3 +6,10 @@ Steps:
 2. Clear nuget cache with `nuget locals all -clear`
 3. Copy nuget package from step `1.` to `./LocalPackages` 
 4. Restore nuget packages in project/reload project
+
+# Creating nuget release
+In `./PrivmxEndpointCsharpExtra` directory run:
+```bash
+dotnet pack -c Release
+```
+nuget package will have dependency on `PrivmxEndpointCsharp` and contain include `InernalTools` dll as its private dependency. 
