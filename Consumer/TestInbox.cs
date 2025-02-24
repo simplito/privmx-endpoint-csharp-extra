@@ -33,7 +33,7 @@ public static class TestInbox
 				{
 					MaxCount = 10,
 					MaxFileSize = 1024,
-					MaxWholeUploadSize = 10 * 1024,
+					MaxWholeUploadSize = 3 * 1024,
 					MinCount = 0
 				});
 			Console.WriteLine("Created inbox, id: " + inboxId);
@@ -43,8 +43,8 @@ public static class TestInbox
 				       )))
 			{
 				await using (var writer = await connection.InboxApi.GetEntryBuilder(inboxId)
-					             .AddFile("myFile", [], [], 1024, 0x0)
-					             .AddFile("secondFile", [], [], 1024, 0x0)
+					             .AddFile("myFile", [], [], 100, 0x0)
+					             .AddFile("secondFile", [], [], 100, 0x0)
 					             .BuildAsync())
 				{
 					await using (var textWriter = new StreamWriter(writer.FileStreams["myFile"]))
