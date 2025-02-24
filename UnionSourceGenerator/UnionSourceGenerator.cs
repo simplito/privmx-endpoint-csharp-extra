@@ -1,6 +1,6 @@
 // Module name: UnionSourceGenerator
 // File name: UnionSourceGenerator.cs
-// Last edit: 2025-02-17 22:02 by Mateusz Chojnowski mchojnowsk@simplito.com
+// Last edit: 2025-02-24 21:02 by Mateusz Chojnowski mchojnowsk@simplito.com
 // Copyright (c) Simplito sp. z o.o.
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
@@ -100,6 +100,9 @@ public readonly partial struct {structName}
 	[FieldOffset(8)]
 	private readonly {secondTypeFullName} _second;
 
+    /// <summary>
+    ///    Type of stored element.
+    /// </summary>
 	public Type ElementType
 	{{
 		get
@@ -115,21 +118,30 @@ public readonly partial struct {structName}
 			}}
 		}}
 	}}
-
+	
+    /// <summary>
+    ///    Creates a new instance of the union from {firstTypeFullName}.
+    /// </summary>
 	public {structName}({firstTypeFullName} element)
 	{{
 		_elementSet = IsFirstType;
 		_second = default!;
 		_first = element;
 	}}
-
+	
+    /// <summary>
+    ///    Creates a new instance of the union from {secondTypeFullName}.
+    /// </summary>
 	public {structName}({secondTypeFullName} element)
 	{{
 		_elementSet = IsSecondType;
 		_first = default!;
 		_second = element;
 	}}
-
+	
+    /// <summary>
+    ///    Matches the value of the union and returns the result of the matching function.
+    /// </summary>
 	public bool Is<T>()
 	{{
 		if (typeof(T) == typeof({firstTypeFullName}))
@@ -140,6 +152,9 @@ public readonly partial struct {structName}
 			return false;
 	}}
 
+	/// <summary>
+    ///    Matches the value of the union and invokes matching function.
+    /// </summary>
 	public void Match(Action<{firstTypeFullName}>? first = null, Action<{secondTypeFullName}>? second = null)
 	{{
 		switch (_elementSet)
@@ -154,7 +169,10 @@ public readonly partial struct {structName}
 				throw new InvalidCastException(""Union was not initialized and doesn't hold any value."");
 		}}
 	}}
-
+	
+	/// <summary>
+    ///    Matches the value of the union and returns the result of the matching function.
+    /// </summary>
 	public T Match<T>(Func<{firstTypeFullName}, T> first, Func<{secondTypeFullName}, T> second)
 	{{
 		switch (_elementSet)
@@ -167,7 +185,10 @@ public readonly partial struct {structName}
 				throw new InvalidCastException(""Union was not initialized and doesn't hold any value."");
 		}}
 	}}
-
+	
+    /// <summary>
+    ///   Converts the union to a value of type {firstTypeFullName}.
+    /// </summary>
 	public static explicit operator {firstTypeFullName}({structName} union)
 	{{
 		if (union._elementSet == IsFirstType)
@@ -176,6 +197,9 @@ public readonly partial struct {structName}
 			$""Union doesn't hold a value of type {firstTypeFullName} but of type {{union.ElementType}} instead."");
 	}}
 
+    /// <summary>
+    ///   Converts the union to a value of type {secondTypeFullName}.
+    /// </summary>
 	public static explicit operator {secondTypeFullName}({structName} union)
 	{{
 		if (union._elementSet == IsFirstType)
@@ -209,7 +233,10 @@ public readonly partial struct {structName}
     private readonly {secondTypeFullName} _second;
 	[FieldOffset(8)]
     private readonly {thirdTypeFullName} _third;
-
+	
+    /// <summary>
+    ///    Type of stored element.
+    /// </summary>
     public Type ElementType
     {{
         get
@@ -223,7 +250,10 @@ public readonly partial struct {structName}
             }};
         }}
     }}
-
+	
+    /// <summary>
+    ///    Creates a new instance of the union from {firstTypeFullName}.
+    /// </summary>
     public {structName}({firstTypeFullName} element)
     {{
         _elementSet = IsFirstType;
@@ -231,7 +261,11 @@ public readonly partial struct {structName}
         _third = default!;
         _first = element;
     }}
-
+	
+	
+    /// <summary>
+    ///    Creates a new instance of the union from {secondTypeFullName}.
+    /// </summary>
     public {structName}({secondTypeFullName} element)
     {{
         _elementSet = IsSecondType;
@@ -240,6 +274,10 @@ public readonly partial struct {structName}
         _second = element;
     }}
 
+	
+    /// <summary>
+    ///    Creates a new instance of the union from {thirdTypeFullName}.
+    /// </summary>
     public {structName}({thirdTypeFullName} element)
     {{
         _elementSet = IsThirdType;
@@ -247,7 +285,10 @@ public readonly partial struct {structName}
         _second = default!;
         _third = element;
     }}
-
+	
+    /// <summary>
+    ///    Matches the value of the union and returns the result of the matching function.
+    /// </summary>
     public bool Is<T>()
     {{
         if (typeof(T) == typeof({firstTypeFullName}))
@@ -260,6 +301,9 @@ public readonly partial struct {structName}
             return false;
     }}
 
+	/// <summary>
+    ///    Matches the value of the union and invokes matching function.
+    /// </summary>
     public void Match(Action<{firstTypeFullName}>? first = null, Action<{secondTypeFullName}>? second = null, Action<{thirdTypeFullName}>? third = null)
     {{
         switch (_elementSet)
@@ -278,6 +322,9 @@ public readonly partial struct {structName}
         }}
     }}
 
+	/// <summary>
+    ///    Matches the value of the union and returns the result of the matching function.
+    /// </summary>
     public T Match<T>(Func<{firstTypeFullName}, T> first, Func<{secondTypeFullName}, T> second, Func<{thirdTypeFullName}, T> third)
     {{
         return _elementSet switch
@@ -288,7 +335,10 @@ public readonly partial struct {structName}
             _ => throw new InvalidCastException(""Union was not initialized and doesn't hold any value."")
         }};
     }}
-
+	
+    /// <summary>
+    ///   Converts the union to a value of type {firstTypeFullName}.
+    /// </summary>
     public static explicit operator {firstTypeFullName}({structName} union)
     {{
         if (union._elementSet == IsFirstType)
@@ -297,6 +347,9 @@ public readonly partial struct {structName}
             $""Union doesn't hold a value of type {firstTypeFullName} but of type {{union.ElementType}} instead."");
     }}
 
+    /// <summary>
+    ///   Converts the union to a value of type {secondTypeFullName}.
+    /// </summary>
     public static explicit operator {secondTypeFullName}({structName} union)
     {{
         if (union._elementSet == IsSecondType)
@@ -304,7 +357,10 @@ public readonly partial struct {structName}
         throw new InvalidCastException(
             $""Union doesn't hold a value of type {secondTypeFullName} but of type {{union.ElementType}} instead."");
     }}
-
+	
+    /// <summary>
+    ///   Converts the union to a value of type {thirdTypeFullName}.
+    /// </summary>
     public static explicit operator {thirdTypeFullName}({structName} union)
     {{
         if (union._elementSet == IsThirdType)
@@ -341,7 +397,10 @@ public readonly partial struct {structName}
     private readonly {thirdTypeFullName} _third;
     [FieldOffset(8)]
     private readonly {fourthTypeFullName} _fourth;
-
+	
+    /// <summary>
+    ///    Type of stored element.
+    /// </summary>
     public Type ElementType
     {{
         get
@@ -357,6 +416,9 @@ public readonly partial struct {structName}
         }}
     }}
 
+    /// <summary>
+    ///    Creates a new instance of the union from {{firstTypeFullName}}.
+    /// </summary>
     public {structName}({firstTypeFullName} element)
     {{
         _elementSet = IsFirstType;
@@ -365,7 +427,10 @@ public readonly partial struct {structName}
         _fourth = default!;
         _first = element;
     }}
-
+	
+    /// <summary>
+    ///    Creates a new instance of the union from {secondTypeFullName}.
+    /// </summary>
     public {structName}({secondTypeFullName} element)
     {{
         _elementSet = IsSecondType;
@@ -374,7 +439,10 @@ public readonly partial struct {structName}
         _fourth = default!;
         _second = element;
     }}
-
+	
+    /// <summary>
+    ///    Creates a new instance of the union from {thirdTypeFullName}.
+    /// </summary>
     public {structName}({thirdTypeFullName} element)
     {{
         _elementSet = IsThirdType;
@@ -383,7 +451,10 @@ public readonly partial struct {structName}
         _fourth = default!;
         _third = element;
     }}
-
+	
+    /// <summary>
+    ///    Creates a new instance of the union from {fourthTypeFullName}.
+    /// </summary>
     public {structName}({fourthTypeFullName} element)
     {{
         _elementSet = IsFourthType;
@@ -393,6 +464,9 @@ public readonly partial struct {structName}
         _fourth = element;
     }}
 
+    /// <summary>
+    ///    Returns true if the union holds a value of type T.
+    /// </summary>
     public bool Is<T>()
     {{
         if (typeof(T) == typeof({firstTypeFullName}))
@@ -406,7 +480,10 @@ public readonly partial struct {structName}
         else
             return false;
     }}
-
+	
+	/// <summary>
+    ///    Matches the value of the union and invokes matching function.
+    /// </summary>
     public void Match(Action<{firstTypeFullName}>? first = null, Action<{secondTypeFullName}>? second = null, Action<{thirdTypeFullName}>? third = null, Action<{fourthTypeFullName}>? fourth = null)
     {{
         switch (_elementSet)
@@ -428,6 +505,9 @@ public readonly partial struct {structName}
         }}
     }}
 
+	/// <summary>
+    ///    Matches the value of the union and returns the result of the matching function.
+    /// </summary>
     public T Match<T>(Func<{firstTypeFullName}, T> first, Func<{secondTypeFullName}, T> second, Func<{thirdTypeFullName}, T> third, Func<{fourthTypeFullName}, T> fourth)
     {{
         return _elementSet switch
@@ -439,7 +519,10 @@ public readonly partial struct {structName}
             _ => throw new InvalidCastException(""Union was not initialized and doesn't hold any value."")
         }};
     }}
-
+	
+    /// <summary>
+    ///   Converts the union to a value of type {firstTypeFullName}.
+    /// </summary>
     public static explicit operator {firstTypeFullName}({structName} union)
     {{
         if (union._elementSet == IsFirstType)
@@ -448,6 +531,9 @@ public readonly partial struct {structName}
             $""Union doesn't hold a value of type {firstTypeFullName} but of type {{union.ElementType}} instead."");
     }}
 
+    /// <summary>
+    ///   Converts the union to a value of type {secondTypeFullName}.
+    /// </summary>
     public static explicit operator {secondTypeFullName}({structName} union)
     {{
         if (union._elementSet == IsSecondType)
@@ -456,6 +542,9 @@ public readonly partial struct {structName}
             $""Union doesn't hold a value of type {secondTypeFullName} but of type {{union.ElementType}} instead."");
     }}
 
+    /// <summary>
+    ///   Converts the union to a value of type {thirdTypeFullName}.
+    /// </summary>
     public static explicit operator {thirdTypeFullName}({structName} union)
     {{
         if (union._elementSet == IsThirdType)
@@ -464,6 +553,9 @@ public readonly partial struct {structName}
             $""Union doesn't hold a value of type {thirdTypeFullName} but of type {{union.ElementType}} instead."");
     }}
 
+    /// <summary>
+    ///   Converts the union to a value of type {fourthTypeFullName}.
+    /// </summary>
     public static explicit operator {fourthTypeFullName}({structName} union)
     {{
         if (union._elementSet == IsFourthType)

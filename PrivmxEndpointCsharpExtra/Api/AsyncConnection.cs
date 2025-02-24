@@ -1,6 +1,6 @@
 ﻿// Module name: PrivmxEndpointCsharpExtra
 // File name: AsyncConnection.cs
-// Last edit: 2025-02-23 23:02 by Mateusz Chojnowski mchojnowsk@simplito.com
+// Last edit: 2025-02-24 21:02 by Mateusz Chojnowski mchojnowsk@simplito.com
 // Copyright (c) Simplito sp. z o.o.
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
@@ -15,7 +15,7 @@ using PrivmxEndpointCsharpExtra.Internals;
 namespace PrivmxEndpointCsharpExtra.Api;
 
 /// <summary>
-///     Main container that manages connection and exposes asynchronous API.
+///     Connection container that manages connection and exposes asynchronous API.
 /// </summary>
 public sealed class AsyncConnection : IAsyncDisposable, IAsyncConnection
 {
@@ -35,14 +35,14 @@ public sealed class AsyncConnection : IAsyncDisposable, IAsyncConnection
 
 	private IConnection Connection { get; }
 
+	/// <inheritdoc />
 	public long GetConnectionId()
 	{
 		_disposeBool.ThrowIfDisposed(nameof(AsyncConnection));
 		return Connection.GetConnectionId();
 	}
 
-	/// <inheritdoc cref="PrivMX.Endpoint.Core.Connection.ListContexts" />
-	/// <param name="token">Cancellation token</param>
+	/// <inheritdoc />
 	public ValueTask<PagingList<Context>> ListContexts(
 		PagingQuery pagingQuery, CancellationToken token = default)
 	{
@@ -60,9 +60,14 @@ public sealed class AsyncConnection : IAsyncDisposable, IAsyncConnection
 		return default;
 	}
 
-	/// <inheritdoc cref="PrivMX.Endpoint.Core.Connection.Connect" />
-	/// <param name="token">Cancellation token</param>
-	/// <returns>Async connection.</returns>
+	/// <summary>
+	///     Connects to the PrivMX Bridge server.
+	/// </summary>
+	/// <param name="userPrivateKey">User's private key.</param>
+	/// <param name="solutionId">ID of the Solution.</param>
+	/// <param name="platformUrl">PrivMX Bridge URL.</param>
+	/// <param name="token">Cancelation token.</param>
+	/// <returns>Created and connected instance of the <see cref="Connection" />.</returns>
 	public static async Task<AsyncConnection> Connect(string userPrivateKey, string solutionId, string platformUrl,
 		CancellationToken token = default)
 	{
@@ -72,9 +77,13 @@ public sealed class AsyncConnection : IAsyncDisposable, IAsyncConnection
 		return new AsyncConnection(connection);
 	}
 
-	/// <inheritdoc cref="PrivMX.Endpoint.Core.Connection.ConnectPublic" />
-	/// <param name="token">Cancellation token</param>
-	/// <returns>Async connection.</returns>
+	/// <summary>
+	///     Connects to the PrivMX Bridge server as a guest user.
+	/// </summary>
+	/// <param name="solutionId">ID of the Solution.</param>
+	/// <param name="platformUrl">PrivMX Bridge URL.</param>
+	/// <param name="token">Cancellation token.</param>
+	/// <returns>Created and connected instance of the <see cref="Connection" />.</returns>
 	public static async Task<AsyncConnection> ConnectPublic(string solutionId, string platformUrl,
 		CancellationToken token = default)
 	{

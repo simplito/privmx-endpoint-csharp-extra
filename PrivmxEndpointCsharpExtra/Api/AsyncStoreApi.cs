@@ -1,6 +1,6 @@
 ﻿// Module name: PrivmxEndpointCsharpExtra
 // File name: AsyncStoreApi.cs
-// Last edit: 2025-02-23 23:02 by Mateusz Chojnowski mchojnowsk@simplito.com
+// Last edit: 2025-02-24 21:02 by Mateusz Chojnowski mchojnowsk@simplito.com
 // Copyright (c) Simplito sp. z o.o.
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
@@ -22,9 +22,11 @@ using File = PrivMX.Endpoint.Store.Models.File;
 
 namespace PrivmxEndpointCsharpExtra.Api;
 
+/// <summary>
+///     Store api container that manages connection and exposes asynchronous API.
+/// </summary>
 public class AsyncStoreApi : IAsyncDisposable, IDisposable, IAsyncStoreApi
 {
-	private static readonly Logger.SourcedLogger<AsyncStoreApi> Logger = default;
 	private readonly long _connectionId;
 	private readonly IEventDispatcher _eventDispatcher;
 	private DisposeBool _disposed;
@@ -167,6 +169,7 @@ public class AsyncStoreApi : IAsyncDisposable, IDisposable, IAsyncStoreApi
 		return _storeApi.ListStoresAsync(contextId, pagingQuery, token);
 	}
 
+	/// <inheritdoc />
 	public ValueTask<PagingList<File>> ListFiles(string storeId, PagingQuery pagingQuery,
 		CancellationToken token = default)
 	{
@@ -193,6 +196,14 @@ public class AsyncStoreApi : IAsyncDisposable, IDisposable, IAsyncStoreApi
 		return new StoreWriteFileStream(null, handle, size, publicMeta, privateMeta, fillValue, _storeApi);
 	}
 
+	/// <inheritdoc />
+	public ValueTask DeleteFile(string fileId, CancellationToken token = default)
+	{
+		_disposed.ThrowIfDisposed(nameof(AsyncStoreApi));
+		token.ThrowIfCancellationRequested();
+		return _storeApi.DeleteFileAsync(fileId, token);
+	}
+
 	/// <summary>
 	///     Opens a file for write.
 	/// </summary>
@@ -213,12 +224,7 @@ public class AsyncStoreApi : IAsyncDisposable, IDisposable, IAsyncStoreApi
 		return new StoreWriteFileStream(fileId, handle, size, publicMeta, privateMeta, fillValue, _storeApi);
 	}
 
-	/// <summary>
-	///     Opens a file for read.
-	/// </summary>
-	/// <param name="fileId">ID of the file to read.</param>
-	/// <param name="token">Cancellation token</param>
-	/// <returns>Fixed size readable stream that supports seek operation.</returns>
+	/// <inheritdoc />
 	public async ValueTask<PrivmxFileStream> OpenFileForRead(string fileId, CancellationToken token = default)
 	{
 		_disposed.ThrowIfDisposed(nameof(AsyncStoreApi));
@@ -229,13 +235,7 @@ public class AsyncStoreApi : IAsyncDisposable, IDisposable, IAsyncStoreApi
 			meta.Result.PublicMeta, meta.Result.PrivateMeta);
 	}
 
-	/// <summary>
-	///     Updates meta data of an existing file in a Store.
-	/// </summary>
-	/// <param name="fileId">ID of the file to update.</param>
-	/// <param name="publicMeta">Public file meta_data.</param>
-	/// <param name="privateMeta">Private file meta_data.</param>
-	/// <param name="token">Cancellation token.</param>
+	/// <inheritdoc />
 	public ValueTask UpdateFileMetaAsync(string fileId, byte[] publicMeta, byte[] privateMeta,
 		CancellationToken token = default)
 	{
@@ -243,21 +243,14 @@ public class AsyncStoreApi : IAsyncDisposable, IDisposable, IAsyncStoreApi
 		return _storeApi.UpdateFileMetaAsync(fileId, publicMeta, privateMeta, token);
 	}
 
-	/// <summary>
-	///     Gets store events.
-	/// </summary>
-	/// <returns>Stream of store events.</returns>
+	/// <inheritdoc />
 	public IObservable<StoreEvent> GetStoreEvents()
 	{
 		_disposed.ThrowIfDisposed(nameof(AsyncStoreApi));
 		return _storeChannelEventDispatcher;
 	}
 
-	/// <summary>
-	///     Gets store file events.
-	/// </summary>
-	/// <param name="storeId">ID of the tracked store.</param>
-	/// <returns>Stream of store file events.</returns>
+	/// <inheritdoc />
 	public IObservable<StoreFileEvent> GetFileEvents(string storeId)
 	{
 		_disposed.ThrowIfDisposed(nameof(AsyncStoreApi));
@@ -275,6 +268,10 @@ public class AsyncStoreApi : IAsyncDisposable, IDisposable, IAsyncStoreApi
 		}
 	}
 
+	/// <summary>
+	///     Disposes store api.
+	/// </summary>
+	/// <exception cref="AggregateException">Grouped exception that may occur during dispose.</exception>
 	public void Dispose()
 	{
 		if (!_disposed.PerformDispose())

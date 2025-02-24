@@ -1,6 +1,6 @@
 ﻿// Module name: PrivmxEndpointCsharpExtra
 // File name: ConnectionSession.cs
-// Last edit: 2025-02-23 23:02 by Mateusz Chojnowski mchojnowsk@simplito.com
+// Last edit: 2025-02-24 21:02 by Mateusz Chojnowski mchojnowsk@simplito.com
 // Copyright (c) Simplito sp. z o.o.
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
@@ -8,7 +8,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Internal;
 using PrivMX.Endpoint.Core;
-using PrivMX.Endpoint.Inbox;
 using PrivmxEndpointCsharpExtra.Api;
 using PrivmxEndpointCsharpExtra.Api.Interfaces;
 using PrivmxEndpointCsharpExtra.Events.Internal;
@@ -25,9 +24,9 @@ public sealed class ConnectionSession : IAsyncDisposable
 {
 	private static readonly Logger.SourcedLogger<ConnectionSession> Logger = default;
 	private readonly AsyncConnection _connection;
+	private readonly AsyncInboxApi _inboxApi;
 	private readonly AsyncStoreApi _storeApi;
 	private readonly AsyncThreadApi _threadApi;
-	private readonly AsyncInboxApi _inboxApi;
 	private DisposeBool _disposed;
 
 	private ConnectionSession(string publicKey, string privateKey, AsyncConnection connection, AsyncThreadApi threadApi,
@@ -51,18 +50,37 @@ public sealed class ConnectionSession : IAsyncDisposable
 	/// </summary>
 	public string PrivateKey { get; }
 
+	/// <summary>
+	///     Connection asynchronous api.
+	/// </summary>
+	/// <exception cref="ObjectDisposedException">Thrown if ConnectionSession is disposed.</exception>
 	public IAsyncConnection Connection =>
 		_disposed ? throw new ObjectDisposedException(nameof(ConnectionSession)) : _connection;
 
+	/// <summary>
+	///     Threads asynchronous api.
+	/// </summary>
+	/// <exception cref="ObjectDisposedException">Thrown if ConnectionSession is disposed.</exception>
 	public IAsyncThreadApi ThreadApi =>
 		_disposed ? throw new ObjectDisposedException(nameof(ConnectionSession)) : _threadApi;
 
+	/// <summary>
+	///     Store asynchronous api.
+	/// </summary>
+	/// <exception cref="ObjectDisposedException">Thrown if ConnectionSession is disposed.</exception>
 	public IAsyncStoreApi StoreApi =>
 		_disposed ? throw new ObjectDisposedException(nameof(ConnectionSession)) : _storeApi;
 
+	/// <summary>
+	///     Inbox asynchronous api.
+	/// </summary>
+	/// <exception cref="ObjectDisposedException">Thrown if ConnectionSession is disposed.</exception>
 	public IAsyncInboxApi InboxApi =>
 		_disposed ? throw new ObjectDisposedException(nameof(ConnectionSession)) : _inboxApi;
 
+	/// <summary>
+	///     Disposes session and frees are underlying resources.
+	/// </summary>
 	[SuppressMessage("Reliability", "CA2012")]
 	public async ValueTask DisposeAsync()
 	{
@@ -70,7 +88,8 @@ public sealed class ConnectionSession : IAsyncDisposable
 			return;
 		try
 		{
-			await ValueTaskTools.WhenAll(_connection.DisposeAsync(), _threadApi.DisposeAsync(), _storeApi.DisposeAsync(), _inboxApi.DisposeAsync());
+			await ValueTaskTools.WhenAll(_connection.DisposeAsync(), _threadApi.DisposeAsync(),
+				_storeApi.DisposeAsync(), _inboxApi.DisposeAsync());
 		}
 		catch (Exception e)
 		{
@@ -79,6 +98,15 @@ public sealed class ConnectionSession : IAsyncDisposable
 		}
 	}
 
+	/// <summary>
+	///     Creates new session with authenticated user.
+	/// </summary>
+	/// <param name="userPrivateKey">User private key.</param>
+	/// <param name="publicKey">User public key.</param>
+	/// <param name="solutionId">Bridge solution ID.</param>
+	/// <param name="platformUrl">Bridge url.</param>
+	/// <param name="token">Cancellation token.</param>
+	/// <returns>Authorized connection session.</returns>
 	public static async ValueTask<ConnectionSession> Create(string userPrivateKey, string publicKey, string solutionId,
 		string platformUrl, CancellationToken token = default)
 	{
@@ -86,6 +114,13 @@ public sealed class ConnectionSession : IAsyncDisposable
 		return CreateInternal(connection, publicKey, userPrivateKey);
 	}
 
+	/// <summary>
+	///     Creates new public session (not authenticated user).
+	/// </summary>
+	/// <param name="solutionId">Bridge solution ID.</param>
+	/// <param name="platformUrl">Bridge url.</param>
+	/// <param name="token">Cancellation token.</param>
+	/// <returns>Not authorized connection session.</returns>
 	public static async ValueTask<ConnectionSession> CreatePublic(string solutionId, string platformUrl,
 		CancellationToken token = default)
 	{
@@ -104,8 +139,7 @@ public sealed class ConnectionSession : IAsyncDisposable
 		var asyncThreadApi = new AsyncThreadApi(threadApi, connectionId, eventDispatcher);
 		var asyncStoreApi = new AsyncStoreApi(storeApi, connectionId, eventDispatcher);
 		var asyncInboxApi = new AsyncInboxApi(inboxApi, connectionId, eventDispatcher);
-		return new ConnectionSession(publicKey, privateKey, asyncConnection, asyncThreadApi, asyncStoreApi, asyncInboxApi);
-	}                                                                   
-
-
+		return new ConnectionSession(publicKey, privateKey, asyncConnection, asyncThreadApi, asyncStoreApi,
+			asyncInboxApi);
+	}
 }

@@ -1,6 +1,6 @@
 ﻿// Module name: PrivmxEndpointCsharpExtra
 // File name: IAsyncStoreApi.cs
-// Last edit: 2025-02-23 23:02 by Mateusz Chojnowski mchojnowsk@simplito.com
+// Last edit: 2025-02-24 21:02 by Mateusz Chojnowski mchojnowsk@simplito.com
 // Copyright (c) Simplito sp. z o.o.
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
@@ -12,6 +12,9 @@ using File = PrivMX.Endpoint.Store.Models.File;
 
 namespace PrivmxEndpointCsharpExtra.Api.Interfaces;
 
+/// <summary>
+///     Interface representing async sotre API.
+/// </summary>
 public interface IAsyncStoreApi
 {
 	/// <summary>
@@ -89,6 +92,13 @@ public interface IAsyncStoreApi
 	ValueTask<PagingList<PrivMX.Endpoint.Store.Models.Store>> ListStores(string contextId,
 		PagingQuery pagingQuery, CancellationToken token = default);
 
+	/// <summary>
+	///     Gets a list of files in given Store.
+	/// </summary>
+	/// <param name="storeId">ID of the Store to get files from.</param>
+	/// <param name="pagingQuery">List query parameters.</param>
+	/// <param name="token">Cancellation token.</param>
+	/// <returns>List of files.</returns>
 	ValueTask<PagingList<File>> ListFiles(string storeId, PagingQuery pagingQuery,
 		CancellationToken token = default);
 
@@ -104,6 +114,13 @@ public interface IAsyncStoreApi
 	/// <returns>Fixed size file stream that supports write operations.</returns>
 	ValueTask<PrivmxFileStream> CreateFile(string storeId, long size, byte[] publicMeta, byte[] privateMeta,
 		byte? fillValue = null, CancellationToken token = default);
+
+	/// <summary>
+	///     Deletes a file by given file ID.
+	/// </summary>
+	/// <param name="fileId">ID of the Store to delete.</param>
+	/// <param name="token">Cancellation token.</param>
+	ValueTask DeleteFile(string fileId, CancellationToken token = default);
 
 	/// <summary>
 	///     Opens a file for write.

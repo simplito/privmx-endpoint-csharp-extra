@@ -1,6 +1,6 @@
 ﻿// Module name: PrivmxEndpointCsharpExtra
 // File name: ConnectionAsyncExtensions.cs
-// Last edit: 2025-02-23 23:02 by Mateusz Chojnowski mchojnowsk@simplito.com
+// Last edit: 2025-02-24 21:02 by Mateusz Chojnowski mchojnowsk@simplito.com
 // Copyright (c) Simplito sp. z o.o.
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
@@ -18,8 +18,14 @@ namespace PrivmxEndpointCsharpExtra;
 /// </summary>
 public static class ConnectionAsyncExtensions
 {
-	/// <inheritdoc cref="PrivMX.Endpoint.Core.Connection.Connect" />
-	/// <param name="token">Cancellation token</param>
+	/// <summary>
+	///     Connects to the PrivMX Bridge server.
+	/// </summary>
+	/// <param name="userPrivKey">User's private key.</param>
+	/// <param name="solutionId">ID of the Solution.</param>
+	/// <param name="platformUrl">PrivMX Bridge URL.</param>
+	/// <param name="token">Cancellation token.</param>
+	/// <returns>Created and connected instance of the Connection</returns>
 	public static ValueTask<Connection> ConnectAsync(string userPrivKey, string solutionId,
 		string platformUrl, CancellationToken token = default)
 	{
@@ -27,16 +33,26 @@ public static class ConnectionAsyncExtensions
 			() => Connection.Connect(userPrivKey, solutionId, platformUrl), token);
 	}
 
-	/// <inheritdoc cref="PrivMX.Endpoint.Core.Connection.ConnectPublic" />
-	/// <param name="token">Cancellation token</param>
+	/// <summary>
+	///     Connects to the PrivMX Bridge server as a guest user.
+	/// </summary>
+	/// <param name="solutionId">ID of the Solution.</param>
+	/// <param name="platformUrl">PrivMX Bridge URL.</param>
+	/// <param name="token">Cancellation token.</param>
+	/// <returns>Created and connected instance of the Connection.</returns>
 	public static ValueTask<Connection> ConnectPublicAsync(string solutionId, string platformUrl,
 		CancellationToken token = default)
 	{
 		return WrapperCallsExecutor.Execute(() => Connection.ConnectPublic(solutionId, platformUrl), token);
 	}
 
-	/// <inheritdoc cref="PrivMX.Endpoint.Core.Connection.ListContexts" />
-	/// <param name="token">Cancellation token</param>
+	/// <summary>
+	///     Gets a list of Contexts available for the user.
+	/// </summary>
+	/// <param name="connection">Extended object.</param>
+	/// <param name="pagingQuery">List query parameters.</param>
+	/// <param name="token">Cancellation token.</param>
+	/// <returns>List of contexts.</returns>
 	public static ValueTask<PagingList<Context>> ListContextsAsync(this IConnection connection,
 		PagingQuery pagingQuery, CancellationToken token = default)
 	{
@@ -45,6 +61,9 @@ public static class ConnectionAsyncExtensions
 		return WrapperCallsExecutor.Execute(() => connection.ListContexts(pagingQuery), token);
 	}
 
+	/// <summary>
+	///     Disconnects from the PrivMX Bridge.
+	/// </summary>
 	public static ValueTask DisconnectAsync(this IConnection connection, CancellationToken token = default)
 	{
 		if (connection is null)
@@ -52,6 +71,10 @@ public static class ConnectionAsyncExtensions
 		return WrapperCallsExecutor.Execute(connection.Disconnect, token);
 	}
 
+	/// <summary>
+	///     Gets the ID of the current connection.
+	/// </summary>
+	/// <returns>ID of the connection.</returns>
 	public static ValueTask<long> GetConnectionIdAsync(this IConnection connection, CancellationToken token = default)
 	{
 		if (connection is null)

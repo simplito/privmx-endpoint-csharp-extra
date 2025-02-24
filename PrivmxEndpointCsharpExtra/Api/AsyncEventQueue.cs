@@ -1,6 +1,6 @@
 ﻿// Module name: PrivmxEndpointCsharpExtra
 // File name: AsyncEventQueue.cs
-// Last edit: 2025-02-23 23:02 by Mateusz Chojnowski mchojnowsk@simplito.com
+// Last edit: 2025-02-24 21:02 by Mateusz Chojnowski mchojnowsk@simplito.com
 // Copyright (c) Simplito sp. z o.o.
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
@@ -25,6 +25,11 @@ public sealed class AsyncEventQueue : IAsyncDisposable
 	private DisposeBool _disposed;
 	private volatile int _isRunningFlag;
 
+	/// <summary>
+	///     Wraps exising event queue into async event queue.
+	///     It's user responsibility to provide valid event queue.
+	/// </summary>
+	/// <param name="eventQueue">Event queue to wrap</param>
 	public AsyncEventQueue(IEventQueue eventQueue)
 	{
 		EventQueue = eventQueue;
@@ -32,6 +37,9 @@ public sealed class AsyncEventQueue : IAsyncDisposable
 
 	private IEventQueue EventQueue { get; set; }
 
+	/// <summary>
+	///     Stops and disposes event queue.
+	/// </summary>
 	public async ValueTask DisposeAsync()
 	{
 		if (!_disposed.PerformDispose())

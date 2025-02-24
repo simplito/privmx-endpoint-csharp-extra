@@ -1,6 +1,6 @@
 ﻿// Module name: PrivmxEndpointCsharpExtra
-// File name: StoreReadonlyFileStream.cs
-// Last edit: 2025-02-19 23:02 by Mateusz Chojnowski mchojnowsk@simplito.com
+// File name: InboxReadFileStream.cs
+// Last edit: 2025-02-24 21:02 by Mateusz Chojnowski mchojnowsk@simplito.com
 // Copyright (c) Simplito sp. z o.o.
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
@@ -16,14 +16,14 @@ namespace PrivmxEndpointCsharpExtra.Inbox;
 ///     Stream that reads data from store file.
 ///     This class is not thread safe.
 /// </summary>
-public sealed class InboxReadFileStream : PrivmxFileStream
+internal sealed class InboxReadFileStream : PrivmxFileStream
 {
 	private static readonly Logger.SourcedLogger<InboxReadFileStream> Logger = default;
 	private readonly long _fileHandle;
-	private DisposeBool _disposed;
-	private long _position;
 	private readonly byte[] _privateMeta;
 	private readonly byte[] _publicMeta;
+	private DisposeBool _disposed;
+	private long _position;
 	private IInboxApi _storeApi;
 
 	internal InboxReadFileStream(long size, long fileHandle, IInboxApi storeApi, byte[] publicMeta,
@@ -40,22 +40,44 @@ public sealed class InboxReadFileStream : PrivmxFileStream
 	public override ReadOnlySpan<byte> PublicMeta => _publicMeta;
 	public override ReadOnlySpan<byte> PrivateMeta => _privateMeta;
 
+	/// <summary>
+	///     Returns if current stream supports reading.
+	/// </summary>
 	public override bool CanRead => !_disposed;
+
+	/// <summary>
+	///     Returns if current stream supports seeking.
+	/// </summary>
 	public override bool CanSeek => !_disposed;
+
+	/// <summary>
+	///     Returns if current stream supports writing.
+	/// </summary>
 	public override bool CanWrite => false;
+
+	/// <summary>
+	///     Returns total length of the stream.
+	/// </summary>
 	public override long Length { get; }
 
+	/// <summary>
+	///     Sets or gets the position with the stream.
+	/// </summary>
 	public override long Position
 	{
 		get => _position;
 		set => SetPosition(value);
 	}
 
+	/// <summary>
+	///     Does nothing.
+	/// </summary>
 	public override void Flush()
 	{
 		// for now file is unbuffered, so no need to flush
 	}
 
+	/// <inheritdoc />
 	public override int Read(byte[] buffer, int offset, int count)
 	{
 		_disposed.ThrowIfDisposed(nameof(InboxReadFileStream));
@@ -65,6 +87,7 @@ public sealed class InboxReadFileStream : PrivmxFileStream
 		return read.Length;
 	}
 
+	/// <inheritdoc />
 	public override long Seek(long offset, SeekOrigin origin)
 	{
 		_disposed.ThrowIfDisposed(nameof(InboxReadFileStream));
@@ -84,11 +107,23 @@ public sealed class InboxReadFileStream : PrivmxFileStream
 		}
 	}
 
+	/// <summary>
+	///     Operation not supported
+	/// </summary>
+	/// <param name="value">Ignored.</param>
+	/// <exception cref="NotSupportedException">Always thrown.</exception>
 	public override void SetLength(long value)
 	{
 		throw new NotSupportedException("SetLength is not supported for read only streams.");
 	}
 
+	/// <summary>
+	///     Opertation not supported.
+	/// </summary>
+	/// <param name="buffer">Ignored.</param>
+	/// <param name="offset">Ignored.</param>
+	/// <param name="count">Ignored.</param>
+	/// <exception cref="NotSupportedException">Always thrown.</exception>
 	public override void Write(byte[] buffer, int offset, int count)
 	{
 		throw new NotSupportedException("Writing is not supported for read only streams.");
@@ -101,6 +136,10 @@ public sealed class InboxReadFileStream : PrivmxFileStream
 		_position = position;
 	}
 
+	/// <summary>
+	///     Disposes the stream and closes the file.
+	/// </summary>
+	/// <param name="disposing">If true then dispose operation is performed by the user.</param>
 	protected override void Dispose(bool disposing)
 	{
 		if (!_disposed.PerformDispose())
@@ -124,6 +163,9 @@ public sealed class InboxReadFileStream : PrivmxFileStream
 		base.Dispose(disposing);
 	}
 
+	/// <summary>
+	///     Disposes stream asynchronously.
+	/// </summary>
 	public override async ValueTask DisposeAsync()
 	{
 		if (!_disposed.PerformDispose())

@@ -1,12 +1,15 @@
 ﻿// Module name: PrivmxEndpointCsharpExtra
 // File name: LogLevel.cs
-// Last edit: 2025-02-23 23:02 by Mateusz Chojnowski mchojnowsk@simplito.com
+// Last edit: 2025-02-24 21:02 by Mateusz Chojnowski mchojnowsk@simplito.com
 // Copyright (c) Simplito sp. z o.o.
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
 
 namespace PrivmxEndpointCsharpExtra.Internals;
 
+/// <summary>
+///     Log severity level.
+/// </summary>
 public enum LogLevel
 {
 	/// <summary>

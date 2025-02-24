@@ -1,6 +1,6 @@
 ﻿// Module name: PrivmxEndpointCsharpExtra
 // File name: WrapperCallsExecutor.cs
-// Last edit: 2025-02-23 23:02 by Mateusz Chojnowski mchojnowsk@simplito.com
+// Last edit: 2025-02-24 21:02 by Mateusz Chojnowski mchojnowsk@simplito.com
 // Copyright (c) Simplito sp. z o.o.
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
@@ -18,16 +18,19 @@ public static class WrapperCallsExecutor
 
 	static WrapperCallsExecutor()
 	{
-		SetDefaultExecutor();
+		_executor = new NoCancellationThreadPoolExecutor();
 	}
 
 	/// <summary>
 	///     Sets executor that will be used to dispatch calls to native library.
 	/// </summary>
 	/// <param name="executor">Executor implementation</param>
-	public static void SetExecutor(IWrapperCallsExecutor executor)
+	public static void SetExecutor(IWrapperCallsExecutor? executor)
 	{
-		_executor = executor;
+		if (executor is null)
+			_executor = new NoCancellationThreadPoolExecutor();
+		else
+			_executor = executor;
 	}
 
 	internal static ValueTask Execute(Action action, CancellationToken cancellationToken = default)
@@ -38,11 +41,6 @@ public static class WrapperCallsExecutor
 	internal static ValueTask<T> Execute<T>(Func<T> action, CancellationToken cancellationToken = default)
 	{
 		return _executor.Execute(action, cancellationToken);
-	}
-
-	public static void SetDefaultExecutor()
-	{
-		_executor = new NoCancellationThreadPoolExecutor();
 	}
 
 	/// <summary>

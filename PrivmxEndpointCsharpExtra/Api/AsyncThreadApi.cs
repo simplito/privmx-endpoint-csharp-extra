@@ -1,6 +1,6 @@
 ﻿// Module name: PrivmxEndpointCsharpExtra
 // File name: AsyncThreadApi.cs
-// Last edit: 2025-02-23 23:02 by Mateusz Chojnowski mchojnowsk@simplito.com
+// Last edit: 2025-02-24 21:02 by Mateusz Chojnowski mchojnowsk@simplito.com
 // Copyright (c) Simplito sp. z o.o.
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
@@ -58,44 +58,97 @@ public sealed class AsyncThreadApi : IAsyncDisposable, IDisposable, IAsyncThread
 		_threadMessageDispatchers = new Dictionary<string, ThreadMessageChannelEventDispatcher>();
 	}
 
+	/// <summary>
+	///     Disposes async thread API with all related resources.
+	/// </summary>
 	public ValueTask DisposeAsync()
 	{
 		Dispose();
 		return default;
 	}
 
-
+	/// <summary>
+	///     Creates new Thread in given Context.
+	/// </summary>
+	/// <param name="contextId">ID of the Context to create the Thread in.</param>
+	/// <param name="users">Array of <see cref="UserWithPubKey" /> which indicates who will have access to the created Thread.</param>
+	/// <param name="managers">
+	///     Array of <see cref="UserWithPubKey" /> which indicates who will have access (and management
+	///     rights) to the created Thread.
+	/// </param>
+	/// <param name="publicMeta">Public (unencrypted) meta data.</param>
+	/// <param name="privateMeta">Private (encrypted) meta data.</param>
+	/// <param name="policies">(optional) Thread policy.</param>
+	/// <param name="token">Cancellation token.</param>
+	/// <returns>ID of the created Thread.</returns>
 	public ValueTask<string> CreateThreadAsync(string contextId, List<UserWithPubKey> users,
-		List<UserWithPubKey> managers, byte[] publicMeta, byte[] privateMeta, ContainerPolicy? containerPolicy = null,
+		List<UserWithPubKey> managers, byte[] publicMeta, byte[] privateMeta, ContainerPolicy? policies = null,
 		CancellationToken token = default)
 	{
 		_disposed.ThrowIfDisposed(nameof(AsyncThreadApi));
 		return WrapperCallsExecutor.Execute(
-			() => _threadApi.CreateThread(contextId, users, managers, publicMeta, privateMeta, containerPolicy), token);
+			() => _threadApi.CreateThread(contextId, users, managers, publicMeta, privateMeta, policies), token);
 	}
 
+	/// <summary>
+	///     Updates an existing Thread.
+	/// </summary>
+	/// <param name="threadId">ID of the Thread to update.</param>
+	/// <param name="users">
+	///     Array of <see cref="UserWithPubKey" /> structs which indicates who will have access to the created
+	///     Thread.
+	/// </param>
+	/// <param name="managers">
+	///     Array of <see cref="UserWithPubKey" /> structs which indicates who will have access (and
+	///     management rights) to the created Thread.
+	/// </param>
+	/// <param name="publicMeta">Public (unencrypted) meta data.</param>
+	/// <param name="privateMeta">Private (encrypted) meta data.</param>
+	/// <param name="version">Current version of the updated Thread.</param>
+	/// <param name="force">Force update (without checking version).</param>
+	/// <param name="forceGenerateNewKey">Force to regenerate a key for the Thread.</param>
+	/// <param name="policies">(optional) Thread policy.</param>
+	/// <param name="token">Cancellation token.</param>
 	public ValueTask UpdateThreadAsync(string threadId, List<UserWithPubKey> users, List<UserWithPubKey> managers,
 		byte[] publicMeta, byte[] privateMeta, long version, bool force, bool forceGenerateNewKey,
-		ContainerPolicy? containerPolicy = null, CancellationToken token = default)
+		ContainerPolicy? policies = null, CancellationToken token = default)
 	{
 		_disposed.ThrowIfDisposed(nameof(AsyncThreadApi));
 		return WrapperCallsExecutor.Execute(
 			() => _threadApi.UpdateThread(threadId, users, managers, publicMeta, privateMeta, version, force,
-				forceGenerateNewKey, containerPolicy), token);
+				forceGenerateNewKey, policies), token);
 	}
 
+	/// <summary>
+	///     Deletes a Thread by given Thread ID.
+	/// </summary>
+	/// <param name="threadId">ID of the Thread to delete.</param>
+	/// <param name="token">Cancellation token.</param>
 	public ValueTask DeleteThreadAsync(string threadId, CancellationToken token = default)
 	{
 		_disposed.ThrowIfDisposed(nameof(AsyncThreadApi));
 		return WrapperCallsExecutor.Execute(() => _threadApi.DeleteThread(threadId), token);
 	}
 
+	/// <summary>
+	///     Gets a Thread by given Thread ID.
+	/// </summary>
+	/// <param name="threadId">ID of Thread to get.</param>
+	/// <param name="token">Cancellation token</param>
+	/// <returns>Information about the Thread.</returns>
 	public ValueTask<Thread> GetThreadAsync(string threadId, CancellationToken token = default)
 	{
 		_disposed.ThrowIfDisposed(nameof(AsyncThreadApi));
 		return WrapperCallsExecutor.Execute(() => _threadApi.GetThread(threadId), token);
 	}
 
+	/// <summary>
+	///     Gets a list of Threads in given Context.
+	/// </summary>
+	/// <param name="contextId">ID of the Context to get the Threads from.</param>
+	/// <param name="pagingQuery">List query parameters.</param>
+	/// <param name="token">Cancellation token.</param>
+	/// <returns>List of Threads.</returns>
 	public ValueTask<PagingList<Thread>> ListThreadsAsync(string contextId, PagingQuery pagingQuery,
 		CancellationToken token = default)
 	{
@@ -103,12 +156,25 @@ public sealed class AsyncThreadApi : IAsyncDisposable, IDisposable, IAsyncThread
 		return WrapperCallsExecutor.Execute(() => _threadApi.ListThreads(contextId, pagingQuery), token);
 	}
 
+	/// <summary>
+	///     Gets a message by given message ID.
+	/// </summary>
+	/// <param name="messageId">ID of the message to get.</param>
+	/// <param name="token">Cancellation token.</param>
+	/// <returns>Message.</returns>
 	public ValueTask<Message> GetMessageAsync(string messageId, CancellationToken token = default)
 	{
 		_disposed.ThrowIfDisposed(nameof(AsyncThreadApi));
 		return WrapperCallsExecutor.Execute(() => _threadApi.GetMessage(messageId), token);
 	}
 
+	/// <summary>
+	///     Gets a list of messages from a Thread.
+	/// </summary>
+	/// <param name="threadId">ID of the Thread to list messages from.</param>
+	/// <param name="pagingQuery">List query parameters.</param>
+	/// <param name="token">Cancellation token.</param>
+	/// <returns>List of messages.</returns>
 	public ValueTask<PagingList<Message>> ListMessagesAsync(string threadId, PagingQuery pagingQuery,
 		CancellationToken token = default)
 	{
@@ -116,6 +182,15 @@ public sealed class AsyncThreadApi : IAsyncDisposable, IDisposable, IAsyncThread
 		return WrapperCallsExecutor.Execute(() => _threadApi.ListMessages(threadId, pagingQuery), token);
 	}
 
+	/// <summary>
+	///     Sends a message in a Thread.
+	/// </summary>
+	/// <param name="threadId">ID of the Thread to send message to.</param>
+	/// <param name="publicMeta">Public message metadata.</param>
+	/// <param name="privateMeta">Private message metadata.</param>
+	/// <param name="data">Content of the message.</param>
+	/// <param name="token">Cancellation token.</param>
+	/// <returns>ID of the new message.</returns>
 	public ValueTask<string> SendMessageAsync(string threadId, byte[] publicMeta, byte[] privateMeta, byte[] data,
 		CancellationToken token = default)
 	{
@@ -124,6 +199,14 @@ public sealed class AsyncThreadApi : IAsyncDisposable, IDisposable, IAsyncThread
 			token);
 	}
 
+	/// <summary>
+	///     Updates a message in a Thread.
+	/// </summary>
+	/// <param name="messageId">ID of the message to update.</param>
+	/// <param name="publicMeta">Public message metadata.</param>
+	/// <param name="privateMeta">Private message metadata.</param>
+	/// <param name="data">Content of the message.</param>
+	/// <param name="token">Cancellation token.</param>
 	public ValueTask UpdateMessageAsync(string messageId, byte[] publicMeta, byte[] privateMeta, byte[] data,
 		CancellationToken token = default)
 	{
@@ -132,18 +215,32 @@ public sealed class AsyncThreadApi : IAsyncDisposable, IDisposable, IAsyncThread
 			token);
 	}
 
+	/// <summary>
+	///     Deletes a message by given message ID.
+	/// </summary>
+	/// <param name="messageId">ID of the message to delete.</param>
+	/// <param name="token">Cancellation token.</param>
 	public ValueTask DeleteMessageAsync(string messageId, CancellationToken token = default)
 	{
 		_disposed.ThrowIfDisposed(nameof(AsyncThreadApi));
 		return WrapperCallsExecutor.Execute(() => _threadApi.DeleteMessage(messageId), token);
 	}
 
+	/// <summary>
+	///     Stream of threads related events.
+	/// </summary>
+	/// <returns>Observable stream of events.</returns>
 	public IObservable<ThreadEvent> GetThreadEvents()
 	{
 		_disposed.ThrowIfDisposed(nameof(AsyncThreadApi));
 		return _threadChannelEventDispatcher;
 	}
 
+	/// <summary>
+	///     Stream of events related to a particular thread.
+	/// </summary>
+	/// <param name="threadId">ID of the thread.</param>
+	/// <returns>Observable stream of events.</returns>
 	public IObservable<ThreadMessageEvent> GetThreadMessageEvents(string threadId)
 	{
 		_disposed.ThrowIfDisposed(nameof(AsyncThreadApi));
@@ -161,7 +258,9 @@ public sealed class AsyncThreadApi : IAsyncDisposable, IDisposable, IAsyncThread
 		}
 	}
 
-
+	/// <summary>
+	///     Dispose async thread API with all related resources.
+	/// </summary>
 	public void Dispose()
 	{
 		if (_disposed.PerformDispose())
