@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrivmxEndpointCsharpExtra", "PrivmxEndpointCsharpExtra\PrivmxEndpointCsharpExtra.csproj", "{A8904230-4DCD-458D-982C-83A47925B92E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrivMX.Endpoint.Extra", "PrivMX.Endpoint.Extra\PrivMX.Endpoint.Extra.csproj", "{A8904230-4DCD-458D-982C-83A47925B92E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InternalTools", "InternalTools\InternalTools.csproj", "{5073E514-C4C7-4C59-883E-9BAB4B79A976}"
 EndProject
