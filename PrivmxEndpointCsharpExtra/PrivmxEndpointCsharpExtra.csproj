@@ -2,27 +2,33 @@
 
     <PropertyGroup>
         <TargetFrameworks>netstandard2.1;net9.0;net8.0;net7.0;net6.0</TargetFrameworks>
+        <PackageName>PrivMX.Endpoint.Extra</PackageName>
+        <PackageId>PrivMX.Endpoint.Extra</PackageId>
+        <Version>0.0.1</Version>
+        <Authors>Simplito sp. z o.o.</Authors>
+        <Product>PrivMX Endpoint C# Extra</Product>
+        <Title>PrivMX Endpoint C# Extra</Title>
+        <Description>Package providing additional functionality for PrivMX Endpoint C#. It adds asynchronous methods, additional abstraction of event dispatching, reading and writing files.</Description>
+        <PackageTags>chat, files, cryptography, privacy, communication, storage, messaging, thread, secure, private, data-transfer, messages, decryption, e2ee, zero-knowledge, end-to-end-encryption, privacy-protection, privmx, simplito</PackageTags>
+        <PackageProjectUrl>https://privmx.dev/</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/simplito/privmx-endpoint-csharp-extra</RepositoryUrl>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <Copyright>Copyright (c) 2025 Simplito sp. z o.o.</Copyright>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <NeutralLanguage>en-US</NeutralLanguage>
+        <RootNamespace>PrivMX.Endpoint.Extra</RootNamespace>
+        <AssemblyName>PrivMX.Endpoint.Extra</AssemblyName>
         <LangVersion>default</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <Version>0.0.1</Version>
-        <Title>Privmx Endpoint Extra</Title>
-        <PackageName>Privmx Endpoint Extra</PackageName>
-        <Authors>Mateusz Chojnowski</Authors>
-        <PackageProjectUrl>https://privmx.dev/</PackageProjectUrl>
-        <Company>Simplito sp. z o.o.</Company>
-        <NeutralLanguage>en-US</NeutralLanguage>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <RepositoryUrl>https://github.com/simplito/privmx-endpoint-csharp</RepositoryUrl>
-        <PackageTags>PrivMX</PackageTags>
-        <PackageReadmeFile>Readme.md</PackageReadmeFile>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="../LICENSE" Pack="true" PackagePath=""/>
-        <None Include="Readme.md" Pack="true" PackagePath="\Readme.md"/>
+        <None Include="../LICENSE" Pack="true" PackagePath="\LICENSE"/>
+        <None Include="../README.md" Pack="true" PackagePath="\README.md"/>
     </ItemGroup>
 
     <ItemGroup>
