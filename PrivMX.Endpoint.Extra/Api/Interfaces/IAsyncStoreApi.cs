@@ -6,11 +6,11 @@
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
 
 using PrivMX.Endpoint.Core.Models;
-using PrivmxEndpointCsharpExtra.Abstractions;
-using PrivmxEndpointCsharpExtra.Events;
+using PrivMX.Endpoint.Extra.Abstractions;
+using PrivMX.Endpoint.Extra.Events;
 using File = PrivMX.Endpoint.Store.Models.File;
 
-namespace PrivmxEndpointCsharpExtra.Api.Interfaces;
+namespace PrivMX.Endpoint.Extra.Api.Interfaces;
 
 /// <summary>
 ///     Interface representing async sotre API.

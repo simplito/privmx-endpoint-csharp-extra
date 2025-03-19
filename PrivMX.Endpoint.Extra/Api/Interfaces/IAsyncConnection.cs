@@ -7,7 +7,7 @@
 
 using PrivMX.Endpoint.Core.Models;
 
-namespace PrivmxEndpointCsharpExtra.Api.Interfaces;
+namespace PrivMX.Endpoint.Extra.Api.Interfaces;
 
 /// <summary>
 ///     Interface representing an asynchronous connection.

@@ -6,12 +6,12 @@
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
 
 using PrivMX.Endpoint.Core.Models;
+using PrivMX.Endpoint.Extra.Abstractions;
+using PrivMX.Endpoint.Extra.Events;
+using PrivMX.Endpoint.Extra.Inbox;
 using PrivMX.Endpoint.Inbox.Models;
-using PrivmxEndpointCsharpExtra.Abstractions;
-using PrivmxEndpointCsharpExtra.Events;
-using PrivmxEndpointCsharpExtra.Inbox;
 
-namespace PrivmxEndpointCsharpExtra.Api.Interfaces;
+namespace PrivMX.Endpoint.Extra.Api.Interfaces;
 
 /// <summary>
 ///     Interface representing async inbox API.

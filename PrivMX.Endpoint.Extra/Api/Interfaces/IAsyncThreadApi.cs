@@ -6,11 +6,10 @@
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
 
 using PrivMX.Endpoint.Core.Models;
+using PrivMX.Endpoint.Extra.Events;
 using PrivMX.Endpoint.Thread.Models;
-using PrivmxEndpointCsharpExtra.Events;
-using Thread = PrivMX.Endpoint.Thread.Models.Thread;
 
-namespace PrivmxEndpointCsharpExtra.Api.Interfaces;
+namespace PrivMX.Endpoint.Extra.Api.Interfaces;
 
 /// <summary>
 ///     Interface for asynchronous operations related to Threads in the PrivMX platform.
@@ -68,7 +67,7 @@ public interface IAsyncThreadApi
 	/// <param name="threadId">ID of the Thread to get.</param>
 	/// <param name="token">Cancellation token.</param>
 	/// <returns>Information about the Thread.</returns>
-	ValueTask<Thread> GetThreadAsync(string threadId, CancellationToken token = default);
+	ValueTask<Thread.Models.Thread> GetThreadAsync(string threadId, CancellationToken token = default);
 
 	/// <summary>
 	///     Gets a list of Threads in the given Context.
@@ -77,7 +76,7 @@ public interface IAsyncThreadApi
 	/// <param name="pagingQuery">List query parameters.</param>
 	/// <param name="token">Cancellation token.</param>
 	/// <returns>List of Threads.</returns>
-	ValueTask<PagingList<Thread>> ListThreadsAsync(string contextId, PagingQuery pagingQuery,
+	ValueTask<PagingList<Thread.Models.Thread>> ListThreadsAsync(string contextId, PagingQuery pagingQuery,
 		CancellationToken token = default);
 
 	/// <summary>

@@ -7,7 +7,7 @@
 
 using PrivMX.Endpoint.Core.Models;
 
-namespace PrivmxEndpointCsharpExtra;
+namespace PrivMX.Endpoint.Extra;
 
 public static class PagingQueryExtension
 {

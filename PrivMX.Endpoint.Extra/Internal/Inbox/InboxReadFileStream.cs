@@ -6,11 +6,11 @@
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
 
 using Internal;
+using PrivMX.Endpoint.Extra.Abstractions;
+using PrivMX.Endpoint.Extra.Internals;
 using PrivMX.Endpoint.Inbox;
-using PrivmxEndpointCsharpExtra.Abstractions;
-using PrivmxEndpointCsharpExtra.Internals;
 
-namespace PrivmxEndpointCsharpExtra.Inbox;
+namespace PrivMX.Endpoint.Extra.Inbox;
 
 /// <summary>
 ///     Stream that reads data from store file.

@@ -7,11 +7,11 @@
 
 using Internal;
 using Internal.Extensions;
-using PrivmxEndpointCsharpExtra.Api;
-using PrivmxEndpointCsharpExtra.Internals;
+using PrivMX.Endpoint.Extra.Api;
+using PrivMX.Endpoint.Extra.Internals;
 using Exception = System.Exception;
 
-namespace PrivmxEndpointCsharpExtra.Events.Internal;
+namespace PrivMX.Endpoint.Extra.Events.Internal;
 
 /// <summary>
 ///     Utility class that listens for incoming events and dispatches them to appropriate event handlers.

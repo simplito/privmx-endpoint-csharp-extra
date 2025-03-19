@@ -6,11 +6,11 @@
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
 
 using Internal;
+using PrivMX.Endpoint.Extra.Abstractions;
+using PrivMX.Endpoint.Extra.Internals;
 using PrivMX.Endpoint.Store;
-using PrivmxEndpointCsharpExtra.Abstractions;
-using PrivmxEndpointCsharpExtra.Internals;
 
-namespace PrivmxEndpointCsharpExtra.Store;
+namespace PrivMX.Endpoint.Extra.Store;
 
 /// <summary>
 ///     Stream that represents remote file in the store.

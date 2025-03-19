@@ -5,22 +5,22 @@
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
 
-using System.ComponentModel;
 using Internal;
 using PrivMX.Endpoint.Core;
 using PrivMX.Endpoint.Core.Models;
+using PrivMX.Endpoint.Extra.Abstractions;
+using PrivMX.Endpoint.Extra.Api.Interfaces;
+using PrivMX.Endpoint.Extra.Events;
+using PrivMX.Endpoint.Extra.Events.Internal;
+using PrivMX.Endpoint.Extra.Inbox;
+using PrivMX.Endpoint.Extra.Internals;
 using PrivMX.Endpoint.Inbox;
 using PrivMX.Endpoint.Inbox.Models;
 using PrivMX.Endpoint.Store;
 using PrivMX.Endpoint.Thread;
-using PrivmxEndpointCsharpExtra.Abstractions;
-using PrivmxEndpointCsharpExtra.Api.Interfaces;
-using PrivmxEndpointCsharpExtra.Events;
-using PrivmxEndpointCsharpExtra.Events.Internal;
-using PrivmxEndpointCsharpExtra.Inbox;
-using PrivmxEndpointCsharpExtra.Internals;
+using System.ComponentModel;
 
-namespace PrivmxEndpointCsharpExtra.Api;
+namespace PrivMX.Endpoint.Extra.Api;
 
 /// <summary>
 ///     Inbox API wrapper that provides asynchronous methods and manages resources.

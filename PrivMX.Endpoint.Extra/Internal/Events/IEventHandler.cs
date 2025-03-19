@@ -7,7 +7,7 @@
 
 using PrivMX.Endpoint.Core.Models;
 
-namespace PrivmxEndpointCsharpExtra.Events;
+namespace PrivMX.Endpoint.Extra.Events;
 
 /// <summary>
 ///     Interface representing an event handler that will be called when event arrive.

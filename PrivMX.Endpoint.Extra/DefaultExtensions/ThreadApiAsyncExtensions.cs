@@ -6,12 +6,11 @@
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
 
 using PrivMX.Endpoint.Core.Models;
+using PrivMX.Endpoint.Extra.Internals;
 using PrivMX.Endpoint.Thread;
 using PrivMX.Endpoint.Thread.Models;
-using PrivmxEndpointCsharpExtra.Internals;
-using Thread = PrivMX.Endpoint.Thread.Models.Thread;
 
-namespace PrivmxEndpointCsharpExtra;
+namespace PrivMX.Endpoint.Extra;
 
 public static class ThreadApiAsyncExtensions
 {
@@ -43,14 +42,14 @@ public static class ThreadApiAsyncExtensions
 		return WrapperCallsExecutor.Execute(() => threadApi.DeleteThread(threadId), token);
 	}
 
-	public static ValueTask<Thread> GetThreadAsync(this IThreadApi threadApi,
+	public static ValueTask<Thread.Models.Thread> GetThreadAsync(this IThreadApi threadApi,
 		string threadId, CancellationToken token = default)
 	{
 		if (threadApi is null) throw new ArgumentException(nameof(threadApi));
 		return WrapperCallsExecutor.Execute(() => threadApi.GetThread(threadId), token);
 	}
 
-	public static ValueTask<PagingList<Thread>> ListThreadsAsync(this IThreadApi api,
+	public static ValueTask<PagingList<Thread.Models.Thread>> ListThreadsAsync(this IThreadApi api,
 		string contextId, PagingQuery pagingQuery, CancellationToken token = default)
 	{
 		if (api == null) throw new ArgumentNullException(nameof(api));

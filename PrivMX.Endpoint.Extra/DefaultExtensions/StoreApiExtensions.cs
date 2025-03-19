@@ -6,11 +6,11 @@
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
 
 using PrivMX.Endpoint.Core.Models;
+using PrivMX.Endpoint.Extra.Internals;
 using PrivMX.Endpoint.Store;
-using PrivmxEndpointCsharpExtra.Internals;
 using File = PrivMX.Endpoint.Store.Models.File;
 
-namespace PrivmxEndpointCsharpExtra;
+namespace PrivMX.Endpoint.Extra;
 
 /// <summary>
 ///     Asynchronous extensions for dtore API.

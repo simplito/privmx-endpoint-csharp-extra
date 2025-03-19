@@ -5,9 +5,9 @@
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
 
-using PrivmxEndpointCsharpExtra.Logging;
+using PrivMX.Endpoint.Extra.Logging;
 
-namespace PrivmxEndpointCsharpExtra.Internals;
+namespace PrivMX.Endpoint.Extra.Internals;
 
 internal sealed class NullLogger : ILibraryLogger
 {

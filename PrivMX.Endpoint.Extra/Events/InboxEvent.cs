@@ -8,7 +8,7 @@
 using Internal.Unions;
 using PrivMX.Endpoint.Inbox.Models;
 
-namespace PrivmxEndpointCsharpExtra.Events;
+namespace PrivMX.Endpoint.Extra.Events;
 
 /// <summary>
 ///     Union of multiple inbox events.

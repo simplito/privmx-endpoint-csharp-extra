@@ -8,9 +8,9 @@
 using Internal;
 using Internal.Observables;
 using PrivMX.Endpoint.Core.Models;
-using PrivmxEndpointCsharpExtra.Internals;
+using PrivMX.Endpoint.Extra.Internals;
 
-namespace PrivmxEndpointCsharpExtra.Events;
+namespace PrivMX.Endpoint.Extra.Events;
 
 internal abstract class ChannelEventDispatcher<T>(
 	string channelName,

@@ -5,9 +5,9 @@
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
 
-using PrivmxEndpointCsharpExtra.Internals;
+using PrivMX.Endpoint.Extra.Internals;
 
-namespace PrivmxEndpointCsharpExtra.Logging;
+namespace PrivMX.Endpoint.Extra.Logging;
 
 /// <summary>
 ///     Interface for all every logger used in the library.

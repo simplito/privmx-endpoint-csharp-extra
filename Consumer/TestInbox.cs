@@ -6,8 +6,8 @@
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
 
 using PrivMX.Endpoint.Core.Models;
+using PrivMX.Endpoint.Extra;
 using PrivMX.Endpoint.Inbox.Models;
-using PrivmxEndpointCsharpExtra;
 
 namespace Consumer;
 

@@ -5,8 +5,8 @@
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
 
-using PrivmxEndpointCsharpExtra.Internals;
-using PrivmxEndpointCsharpExtra.Logging;
+using PrivMX.Endpoint.Extra.Internals;
+using PrivMX.Endpoint.Extra.Logging;
 
 namespace Consumer;
 
@@ -14,8 +14,8 @@ public static class Logger
 {
 	public static void SetupLogger()
 	{
-		PrivmxEndpointCsharpExtra.Internals.Logger.SetLogger(new ConsoleLogger());
-		PrivmxEndpointCsharpExtra.Internals.Logger.UnobservedExceptions +=
+		PrivMX.Endpoint.Extra.Internals.Logger.SetLogger(new ConsoleLogger());
+		PrivMX.Endpoint.Extra.Internals.Logger.UnobservedExceptions +=
 			exception => Console.WriteLine($"Unobserved exception: {exception}");
 	}
 

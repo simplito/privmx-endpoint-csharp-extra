@@ -9,7 +9,7 @@ using Internal.Unions;
 using PrivMX.Endpoint.Store.Models;
 using PrivMX.Endpoint.Thread.Models;
 
-namespace PrivmxEndpointCsharpExtra.Events;
+namespace PrivMX.Endpoint.Extra.Events;
 
 /// <summary>
 ///     Union of multiple store file events.

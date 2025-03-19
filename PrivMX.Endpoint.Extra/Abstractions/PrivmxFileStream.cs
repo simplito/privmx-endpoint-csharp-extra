@@ -5,7 +5,7 @@
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
 
-namespace PrivmxEndpointCsharpExtra.Abstractions;
+namespace PrivMX.Endpoint.Extra.Abstractions;
 
 /// <summary>
 ///     Abstract class representing a Privmx file stream.

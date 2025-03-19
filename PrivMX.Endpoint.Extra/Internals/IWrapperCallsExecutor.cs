@@ -5,7 +5,7 @@
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
 
-namespace PrivmxEndpointCsharpExtra.Internals;
+namespace PrivMX.Endpoint.Extra.Internals;
 
 /// <summary>
 ///     Interface for object used to execute calls to native library trough privmx-endpoint-csharp

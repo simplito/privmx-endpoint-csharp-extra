@@ -5,9 +5,9 @@
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
 
+using Internal.Extensions;
 using System;
 using System.Collections.Generic;
-using Internal.Extensions;
 
 namespace Internal.Observables;
 

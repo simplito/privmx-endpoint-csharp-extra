@@ -5,7 +5,7 @@
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
 
-namespace PrivmxEndpointCsharpExtra.Events;
+namespace PrivMX.Endpoint.Extra.Events;
 
 /// <summary>
 ///     Dispatcher that routes events from a single connection.

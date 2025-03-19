@@ -7,7 +7,7 @@
 
 using PrivMX.Endpoint.Core.Models;
 using PrivMX.Endpoint.Crypto;
-using PrivmxEndpointCsharpExtra;
+using PrivMX.Endpoint.Extra;
 
 namespace Consumer;
 

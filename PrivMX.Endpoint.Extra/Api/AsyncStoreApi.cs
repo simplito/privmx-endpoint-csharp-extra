@@ -5,22 +5,22 @@
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
 
-using System.ComponentModel;
 using Internal;
 using PrivMX.Endpoint.Core;
 using PrivMX.Endpoint.Core.Models;
+using PrivMX.Endpoint.Extra.Abstractions;
+using PrivMX.Endpoint.Extra.Api.Interfaces;
+using PrivMX.Endpoint.Extra.Events;
+using PrivMX.Endpoint.Extra.Events.Internal;
+using PrivMX.Endpoint.Extra.Internals;
+using PrivMX.Endpoint.Extra.Store;
 using PrivMX.Endpoint.Store;
 using PrivMX.Endpoint.Store.Models;
 using PrivMX.Endpoint.Thread.Models;
-using PrivmxEndpointCsharpExtra.Abstractions;
-using PrivmxEndpointCsharpExtra.Api.Interfaces;
-using PrivmxEndpointCsharpExtra.Events;
-using PrivmxEndpointCsharpExtra.Events.Internal;
-using PrivmxEndpointCsharpExtra.Internals;
-using PrivmxEndpointCsharpExtra.Store;
+using System.ComponentModel;
 using File = PrivMX.Endpoint.Store.Models.File;
 
-namespace PrivmxEndpointCsharpExtra.Api;
+namespace PrivMX.Endpoint.Extra.Api;
 
 /// <summary>
 ///     Store api container that manages connection and exposes asynchronous API.

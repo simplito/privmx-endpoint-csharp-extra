@@ -6,11 +6,11 @@
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
 
 using PrivMX.Endpoint.Core.Models;
+using PrivMX.Endpoint.Extra.Internals;
 using PrivMX.Endpoint.Inbox;
 using PrivMX.Endpoint.Inbox.Models;
-using PrivmxEndpointCsharpExtra.Internals;
 
-namespace PrivmxEndpointCsharpExtra;
+namespace PrivMX.Endpoint.Extra;
 
 public static class InboxApiExtensions
 {

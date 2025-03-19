@@ -5,14 +5,14 @@
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
 
-using System.Runtime.CompilerServices;
 using Internal;
 using Internal.Extensions;
 using PrivMX.Endpoint.Core;
 using PrivMX.Endpoint.Core.Models;
-using PrivmxEndpointCsharpExtra.Internals;
+using PrivMX.Endpoint.Extra.Internals;
+using System.Runtime.CompilerServices;
 
-namespace PrivmxEndpointCsharpExtra.Api;
+namespace PrivMX.Endpoint.Extra.Api;
 
 /// <summary>
 ///     Wrapper for event queue that allows to iterate events asynchronously.

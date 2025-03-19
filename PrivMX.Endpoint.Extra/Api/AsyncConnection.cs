@@ -5,14 +5,14 @@
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
 
-using System.ComponentModel;
 using Internal;
 using PrivMX.Endpoint.Core;
 using PrivMX.Endpoint.Core.Models;
-using PrivmxEndpointCsharpExtra.Api.Interfaces;
-using PrivmxEndpointCsharpExtra.Internals;
+using PrivMX.Endpoint.Extra.Api.Interfaces;
+using PrivMX.Endpoint.Extra.Internals;
+using System.ComponentModel;
 
-namespace PrivmxEndpointCsharpExtra.Api;
+namespace PrivMX.Endpoint.Extra.Api;
 
 /// <summary>
 ///     Connection container that manages connection and exposes asynchronous API.

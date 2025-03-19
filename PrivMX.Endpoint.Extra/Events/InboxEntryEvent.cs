@@ -8,6 +8,6 @@
 using Internal.Unions;
 using PrivMX.Endpoint.Inbox.Models;
 
-namespace PrivmxEndpointCsharpExtra.Events;
+namespace PrivMX.Endpoint.Extra.Events;
 
 public partial struct InboxEntryEvent : IUnion<InboxEntryCreatedEvent, InboxEntryDeletedEvent>;

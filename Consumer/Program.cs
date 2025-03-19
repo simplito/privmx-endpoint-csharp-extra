@@ -8,12 +8,12 @@
 using PrivMX.Endpoint.Core;
 using PrivMX.Endpoint.Core.Models;
 using PrivMX.Endpoint.Crypto;
+using PrivMX.Endpoint.Extra;
+using PrivMX.Endpoint.Extra.Api;
+using PrivMX.Endpoint.Extra.Events;
+using PrivMX.Endpoint.Extra.Internals;
+using PrivMX.Endpoint.Extra.Logging;
 using PrivMX.Endpoint.Thread;
-using PrivmxEndpointCsharpExtra;
-using PrivmxEndpointCsharpExtra.Api;
-using PrivmxEndpointCsharpExtra.Events;
-using PrivmxEndpointCsharpExtra.Internals;
-using PrivmxEndpointCsharpExtra.Logging;
 
 namespace Consumer;
 

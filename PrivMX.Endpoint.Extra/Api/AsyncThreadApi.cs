@@ -5,19 +5,18 @@
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
 
-using System.ComponentModel;
 using Internal;
 using PrivMX.Endpoint.Core;
 using PrivMX.Endpoint.Core.Models;
+using PrivMX.Endpoint.Extra.Api.Interfaces;
+using PrivMX.Endpoint.Extra.Events;
+using PrivMX.Endpoint.Extra.Events.Internal;
+using PrivMX.Endpoint.Extra.Internals;
 using PrivMX.Endpoint.Thread;
 using PrivMX.Endpoint.Thread.Models;
-using PrivmxEndpointCsharpExtra.Api.Interfaces;
-using PrivmxEndpointCsharpExtra.Events;
-using PrivmxEndpointCsharpExtra.Events.Internal;
-using PrivmxEndpointCsharpExtra.Internals;
-using Thread = PrivMX.Endpoint.Thread.Models.Thread;
+using System.ComponentModel;
 
-namespace PrivmxEndpointCsharpExtra.Api;
+namespace PrivMX.Endpoint.Extra.Api;
 
 /// <summary>
 ///     Asynchronous wrapper over thread API.
@@ -136,7 +135,7 @@ public sealed class AsyncThreadApi : IAsyncDisposable, IDisposable, IAsyncThread
 	/// <param name="threadId">ID of Thread to get.</param>
 	/// <param name="token">Cancellation token</param>
 	/// <returns>Information about the Thread.</returns>
-	public ValueTask<Thread> GetThreadAsync(string threadId, CancellationToken token = default)
+	public ValueTask<Thread.Models.Thread> GetThreadAsync(string threadId, CancellationToken token = default)
 	{
 		_disposed.ThrowIfDisposed(nameof(AsyncThreadApi));
 		return WrapperCallsExecutor.Execute(() => _threadApi.GetThread(threadId), token);
@@ -149,7 +148,7 @@ public sealed class AsyncThreadApi : IAsyncDisposable, IDisposable, IAsyncThread
 	/// <param name="pagingQuery">List query parameters.</param>
 	/// <param name="token">Cancellation token.</param>
 	/// <returns>List of Threads.</returns>
-	public ValueTask<PagingList<Thread>> ListThreadsAsync(string contextId, PagingQuery pagingQuery,
+	public ValueTask<PagingList<Thread.Models.Thread>> ListThreadsAsync(string contextId, PagingQuery pagingQuery,
 		CancellationToken token = default)
 	{
 		_disposed.ThrowIfDisposed(nameof(AsyncThreadApi));

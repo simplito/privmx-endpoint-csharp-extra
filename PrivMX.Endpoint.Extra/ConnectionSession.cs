@@ -5,15 +5,15 @@
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
 
-using System.Diagnostics.CodeAnalysis;
 using Internal;
 using PrivMX.Endpoint.Core;
-using PrivmxEndpointCsharpExtra.Api;
-using PrivmxEndpointCsharpExtra.Api.Interfaces;
-using PrivmxEndpointCsharpExtra.Events.Internal;
-using PrivmxEndpointCsharpExtra.Internals;
+using PrivMX.Endpoint.Extra.Api;
+using PrivMX.Endpoint.Extra.Api.Interfaces;
+using PrivMX.Endpoint.Extra.Events.Internal;
+using PrivMX.Endpoint.Extra.Internals;
+using System.Diagnostics.CodeAnalysis;
 
-namespace PrivmxEndpointCsharpExtra;
+namespace PrivMX.Endpoint.Extra;
 
 /// <summary>
 ///     Container class that wraps single connection and manages its state.

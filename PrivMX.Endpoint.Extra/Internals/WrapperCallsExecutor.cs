@@ -7,7 +7,7 @@
 
 using Internal.Extensions;
 
-namespace PrivmxEndpointCsharpExtra.Internals;
+namespace PrivMX.Endpoint.Extra.Internals;
 
 /// <summary>
 ///     Class responsible dispatching calls to native library.

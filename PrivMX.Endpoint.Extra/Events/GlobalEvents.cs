@@ -5,12 +5,12 @@
 // 
 // This file is part of privmx-endpoint-csharp extra published under MIT License.
 
-using System.ComponentModel;
 using Internal;
 using PrivMX.Endpoint.Core.Models;
-using PrivmxEndpointCsharpExtra.Events.Internal;
+using PrivMX.Endpoint.Extra.Events.Internal;
+using System.ComponentModel;
 
-namespace PrivmxEndpointCsharpExtra.Events;
+namespace PrivMX.Endpoint.Extra.Events;
 
 /// <summary>
 ///     Represents global events in the PrivMX platform.

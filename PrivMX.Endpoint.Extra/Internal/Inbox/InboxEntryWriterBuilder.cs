@@ -7,7 +7,7 @@
 
 using PrivMX.Endpoint.Inbox;
 
-namespace PrivmxEndpointCsharpExtra.Inbox;
+namespace PrivMX.Endpoint.Extra.Inbox;
 
 /// <summary>
 ///     Builder structure used to declare content of new inbox entry.

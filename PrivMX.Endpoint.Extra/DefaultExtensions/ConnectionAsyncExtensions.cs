@@ -7,9 +7,9 @@
 
 using PrivMX.Endpoint.Core;
 using PrivMX.Endpoint.Core.Models;
-using PrivmxEndpointCsharpExtra.Internals;
+using PrivMX.Endpoint.Extra.Internals;
 
-namespace PrivmxEndpointCsharpExtra;
+namespace PrivMX.Endpoint.Extra;
 
 /// <summary>
 ///     Extension methods that provide asynchronous method execution for objects implementing <see cref="IConnection" />
