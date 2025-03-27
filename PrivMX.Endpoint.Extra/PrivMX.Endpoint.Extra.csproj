@@ -13,6 +13,7 @@
         <PackageProjectUrl>https://privmx.dev/</PackageProjectUrl>
         <RepositoryUrl>https://github.com/simplito/privmx-endpoint-csharp-extra</RepositoryUrl>
         <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageIcon>icon.png</PackageIcon>
         <Copyright>Copyright (c) 2025 Simplito sp. z o.o.</Copyright>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <NeutralLanguage>en-US</NeutralLanguage>
