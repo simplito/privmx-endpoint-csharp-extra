@@ -1,28 +1,32 @@
-﻿// Module name: Consumer
-// File name: Program.cs
-// Last edit: 2025-02-17 08:48 by Mateusz Chojnowski mchojnowsk@simplito.com
-// Copyright (c) Simplito sp. z o.o.
-// 
-// This file is part of privmx-endpoint-csharp extra published under MIT License.
+﻿//
+// PrivMX Endpoint C# Extra
+// Copyright © 2024 Simplito sp. z o.o.
+//
+// This file is part of the PrivMX Platform (https://privmx.dev).
+// This software is Licensed under the MIT License.
+//
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
 
 using PrivMX.Endpoint.Core;
 using PrivMX.Endpoint.Core.Models;
 using PrivMX.Endpoint.Crypto;
+using PrivMX.Endpoint.Extra;
+using PrivMX.Endpoint.Extra.Api;
+using PrivMX.Endpoint.Extra.Events;
+using PrivMX.Endpoint.Extra.Internals;
+using PrivMX.Endpoint.Extra.Logging;
 using PrivMX.Endpoint.Thread;
-using PrivmxEndpointCsharpExtra;
-using PrivmxEndpointCsharpExtra.Api;
-using PrivmxEndpointCsharpExtra.Events;
-using PrivmxEndpointCsharpExtra.Internals;
-using PrivmxEndpointCsharpExtra.Logging;
 
 namespace Consumer;
 
 internal class Program
 {
-	const string password = "password1";
-	const string salt = "test";
-	const string solutionId = "3b54def9-dca1-434f-9231-f3852a83d878";
-	const string contextId = "8a1bcb91-e34c-4192-a0b7-2bd5975d014c";
+	const string password = "";
+	const string salt = "";
+	const string solutionId = "";
+	const string contextId = "";
 
 	// private static async Task Clean(Connection connection)
 	// {
@@ -34,7 +38,7 @@ internal class Program
 	// 	}
 	// }
 
-	private static async Task Main(string[] args)
+    private static async Task Main(string[] args)
 	{
 		Logger.SetupLogger();
 		using var globalEvents = new GlobalEvents();

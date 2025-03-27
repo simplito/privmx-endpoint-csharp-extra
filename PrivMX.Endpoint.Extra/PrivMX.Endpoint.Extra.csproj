@@ -1,0 +1,64 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>netstandard2.1</TargetFrameworks>
+        <PackageName>PrivMX.Endpoint.Extra</PackageName>
+        <PackageId>PrivMX.Endpoint.Extra</PackageId>
+        <Version>2.2.0</Version>
+        <Authors>Simplito sp. z o.o.</Authors>
+        <Product>PrivMX Endpoint C# Extra</Product>
+        <Title>PrivMX Endpoint C# Extra</Title>
+        <Description>Package providing additional functionality for PrivMX Endpoint C#. It adds asynchronous methods, additional abstraction of event dispatching, reading and writing files.</Description>
+        <PackageTags>chat, files, cryptography, privacy, communication, storage, messaging, thread, secure, private, data-transfer, messages, decryption, e2ee, zero-knowledge, end-to-end-encryption, privacy-protection, privmx, simplito</PackageTags>
+        <PackageProjectUrl>https://privmx.dev/</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/simplito/privmx-endpoint-csharp-extra</RepositoryUrl>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageIcon>icon.png</PackageIcon>
+        <Copyright>Copyright (c) 2025 Simplito sp. z o.o.</Copyright>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <NeutralLanguage>en-US</NeutralLanguage>
+        <RootNamespace>PrivMX.Endpoint.Extra</RootNamespace>
+        <AssemblyName>PrivMX.Endpoint.Extra</AssemblyName>
+        <LangVersion>default</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="../LICENSE" Pack="true" PackagePath="\LICENSE"/>
+        <None Include="../README.md" Pack="true" PackagePath="\README.md"/>
+        <None Include="images/icon.png" Pack="true" PackagePath="\icon.png"/>
+    </ItemGroup>
+
+    <ItemGroup>
+	    <PackageReference Include="PrivMX.Endpoint" Version="2.2.0"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\InternalTools\InternalTools.csproj" PrivateAssets="all"/>
+        <ProjectReference Include="..\UnionSourceGenerator\UnionSourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
+    </ItemGroup>
+
+    <PropertyGroup>
+        <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
+    </PropertyGroup>
+
+    <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="BuildOnlySettings;ResolveReferences">
+        <ItemGroup>
+            <!-- Filter out unnecessary files -->
+            <_ReferenceCopyLocalPaths Include="@(ReferenceCopyLocalPaths->WithMetadataValue('ReferenceSourceTarget', 'ProjectReference')->WithMetadataValue('PrivateAssets', 'All'))"/>
+        </ItemGroup>
+
+        <!-- Print batches for debug purposes -->
+        <Message Text="Batch for .nupkg: ReferenceCopyLocalPaths = @(_ReferenceCopyLocalPaths), ReferenceCopyLocalPaths.DestinationSubDirectory = %(_ReferenceCopyLocalPaths.DestinationSubDirectory) Filename = %(_ReferenceCopyLocalPaths.Filename) Extension = %(_ReferenceCopyLocalPaths.Extension)" Importance="High" Condition="'@(_ReferenceCopyLocalPaths)' != ''"/>
+
+        <ItemGroup>
+            <!-- Add file to package with consideration of sub folder. If empty, the root folder is chosen. -->
+            <BuildOutputInPackage Include="@(_ReferenceCopyLocalPaths)" TargetPath="%(_ReferenceCopyLocalPaths.DestinationSubDirectory)"/>
+        </ItemGroup>
+    </Target>
+
+</Project>
