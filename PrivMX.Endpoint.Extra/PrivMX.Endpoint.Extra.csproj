@@ -4,7 +4,7 @@
         <TargetFrameworks>netstandard2.1</TargetFrameworks>
         <PackageName>PrivMX.Endpoint.Extra</PackageName>
         <PackageId>PrivMX.Endpoint.Extra</PackageId>
-        <Version>0.0.1</Version>
+        <Version>2.2.0</Version>
         <Authors>Simplito sp. z o.o.</Authors>
         <Product>PrivMX Endpoint C# Extra</Product>
         <Title>PrivMX Endpoint C# Extra</Title>
