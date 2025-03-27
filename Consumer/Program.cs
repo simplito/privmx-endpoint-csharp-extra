@@ -23,10 +23,10 @@ namespace Consumer;
 
 internal class Program
 {
-	const string password = "password1";
-	const string salt = "test";
-	const string solutionId = "3b54def9-dca1-434f-9231-f3852a83d878";
-	const string contextId = "8a1bcb91-e34c-4192-a0b7-2bd5975d014c";
+	const string password = "";
+	const string salt = "";
+	const string solutionId = "";
+	const string contextId = "";
 
 	// private static async Task Clean(Connection connection)
 	// {
@@ -38,7 +38,7 @@ internal class Program
 	// 	}
 	// }
 
-	private static async Task Main(string[] args)
+    private static async Task Main(string[] args)
 	{
 		Logger.SetupLogger();
 		using var globalEvents = new GlobalEvents();
