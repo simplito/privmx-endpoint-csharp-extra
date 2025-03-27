@@ -75,8 +75,7 @@ public sealed class AsyncConnection : IAsyncDisposable, IAsyncConnection
 	public static async Task<AsyncConnection> Connect(string userPrivateKey, string solutionId, string platformUrl,
 		CancellationToken token = default)
 	{
-		Logger.Log(LogLevel.Trace, "Connecting to {0}, solution {1}, with userKey {2}", platformUrl, solutionId,
-			userPrivateKey);
+		Logger.Log(LogLevel.Trace, "Connecting to {0}, solution {1}", platformUrl, solutionId);
 		var connection = await ConnectionAsyncExtensions.ConnectAsync(userPrivateKey, solutionId, platformUrl, token);
 		return new AsyncConnection(connection);
 	}
