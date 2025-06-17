@@ -31,15 +31,17 @@ public sealed class ConnectionSession : IAsyncDisposable
 	private readonly AsyncInboxApi _inboxApi;
 	private readonly AsyncStoreApi _storeApi;
 	private readonly AsyncThreadApi _threadApi;
+	private readonly AsyncEventApi _eventApi;
 	private DisposeBool _disposed;
 
 	private ConnectionSession(string publicKey, string privateKey, AsyncConnection connection, AsyncThreadApi threadApi,
-		AsyncStoreApi storeApi, AsyncInboxApi inboxApi)
+		AsyncStoreApi storeApi, AsyncInboxApi inboxApi, AsyncEventApi eventApi)
 	{
 		_connection = connection;
 		_threadApi = threadApi;
 		_storeApi = storeApi;
 		_inboxApi = inboxApi;
+		_eventApi = eventApi;
 		PublicKey = publicKey;
 		PrivateKey = privateKey;
 	}
@@ -81,6 +83,13 @@ public sealed class ConnectionSession : IAsyncDisposable
 	/// <exception cref="ObjectDisposedException">Thrown if ConnectionSession is disposed.</exception>
 	public IAsyncInboxApi InboxApi =>
 		_disposed ? throw new ObjectDisposedException(nameof(ConnectionSession)) : _inboxApi;
+
+	/// <summary>
+	///     Event asynchronous api.
+	/// </summary>
+	/// <exception cref="ObjectDisposedException">Thrown if ConnectionSession is disposed.</exception>
+	public IAsyncEventApi EventApi =>
+		_disposed ? throw new ObjectDisposedException(nameof(ConnectionSession)) : _eventApi;
 
 	/// <summary>
 	///     Disposes session and frees are underlying resources.
@@ -139,11 +148,13 @@ public sealed class ConnectionSession : IAsyncDisposable
 		var threadApi = PrivMX.Endpoint.Thread.ThreadApi.Create(connection);
 		var storeApi = PrivMX.Endpoint.Store.StoreApi.Create(connection);
 		var inboxApi = PrivMX.Endpoint.Inbox.InboxApi.Create(connection, threadApi, storeApi);
+		var eventApi = PrivMX.Endpoint.Event.EventApi.Create(connection);
 		var eventDispatcher = PrivMXEventDispatcher.Instance;
 		var asyncThreadApi = new AsyncThreadApi(threadApi, connectionId, eventDispatcher);
 		var asyncStoreApi = new AsyncStoreApi(storeApi, connectionId, eventDispatcher);
 		var asyncInboxApi = new AsyncInboxApi(inboxApi, connectionId, eventDispatcher);
+		var asyncEventApi = new AsyncEventApi(eventApi, connectionId, eventDispatcher);
 		return new ConnectionSession(publicKey, privateKey, asyncConnection, asyncThreadApi, asyncStoreApi,
-			asyncInboxApi);
+			asyncInboxApi, asyncEventApi);
 	}
 }
