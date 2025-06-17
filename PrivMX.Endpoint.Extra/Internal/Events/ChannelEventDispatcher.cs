@@ -28,7 +28,7 @@ internal abstract class ChannelEventDispatcher<T>(
 
 	protected InvokeObservable<T> WrappedInvokeObservable { get; set; } = new();
 
-	public abstract void HandleEvent(Event @event);
+	public abstract void HandleEvent(Core.Models.Event @event);
 
 
 	public void Dispose()

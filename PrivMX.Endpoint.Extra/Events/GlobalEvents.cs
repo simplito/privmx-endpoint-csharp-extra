@@ -58,20 +58,20 @@ public class GlobalEvents : IDisposable
 	///     Gets an observable stream of all events.
 	/// </summary>
 	/// <returns>An observable stream of <see cref="Event" />.</returns>
-	public IObservable<Event> AllEvents()
+	public IObservable<Core.Models.Event> AllEvents()
 	{
 		_disposed.ThrowIfDisposed(nameof(GlobalEvents));
 		return _channelDispatcher;
 	}
 
-	private class NonExistingChannelDispatcher : ChannelEventDispatcher<Event>
+	private class NonExistingChannelDispatcher : ChannelEventDispatcher<Core.Models.Event>
 	{
 		public NonExistingChannelDispatcher(IEventDispatcher eventDispatcher) : base(
 			PrivMXEventDispatcher.WildcardChannel, 0, eventDispatcher)
 		{
 		}
 
-		public override void HandleEvent(Event @event)
+		public override void HandleEvent(Core.Models.Event @event)
 		{
 			WrappedInvokeObservable.Send(@event);
 		}

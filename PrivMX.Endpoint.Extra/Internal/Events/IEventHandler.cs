@@ -22,5 +22,5 @@ public interface IEventHandler : IDisposable
 	///     Handles incoming event.
 	/// </summary>
 	/// <param name="event">Event to handle.</param>
-	public void HandleEvent(Event @event);
+	public void HandleEvent(Core.Models.Event @event);
 }

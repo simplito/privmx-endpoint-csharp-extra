@@ -318,7 +318,7 @@ public class AsyncStoreApi : IAsyncDisposable, IDisposable, IAsyncStoreApi
 			Connection.UnsubscribeFromStoreEvents();
 		}
 
-		public override void HandleEvent(Event @event)
+		public override void HandleEvent(Core.Models.Event @event)
 		{
 			switch (@event)
 			{
@@ -360,7 +360,7 @@ public class AsyncStoreApi : IAsyncDisposable, IDisposable, IAsyncStoreApi
 			Connection.UnsubscribeFromFileEvents(storeId);
 		}
 
-		public override void HandleEvent(Event @event)
+		public override void HandleEvent(Core.Models.Event @event)
 		{
 			switch (@event)
 			{

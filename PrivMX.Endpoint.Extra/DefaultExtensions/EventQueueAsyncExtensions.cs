@@ -25,7 +25,7 @@ public static class EventQueueAsyncExtensions
 	///     Waiting can be canceled by <see cref="EmitBreakEventAsync" />.
 	/// </summary>
 	/// <returns>A new event.</returns>
-	public static ValueTask<Event> WaitEventAsync(this IEventQueue eventQueue,
+	public static ValueTask<Core.Models.Event> WaitEventAsync(this IEventQueue eventQueue,
 		CancellationToken token = default)
 	{
 		if (eventQueue == null)
@@ -37,7 +37,7 @@ public static class EventQueueAsyncExtensions
 	///     Gets a new event from the queue.
 	/// </summary>
 	/// <returns>A new event, or <see langword="null" /> if no events in the queue.</returns>
-	public static ValueTask<Event?> GetEvent(this IEventQueue eventQueue, CancellationToken token = default)
+	public static ValueTask<Core.Models.Event?> GetEvent(this IEventQueue eventQueue, CancellationToken token = default)
 	{
 		if (eventQueue == null)
 			throw new ArgumentNullException(nameof(eventQueue));

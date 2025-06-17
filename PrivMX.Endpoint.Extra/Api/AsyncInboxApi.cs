@@ -231,7 +231,7 @@ public class AsyncInboxApi : IAsyncInboxApi, IAsyncDisposable, IDisposable
 			connection.UnsubscribeFromInboxEvents();
 		}
 
-		public override void HandleEvent(Event @event)
+		public override void HandleEvent(Core.Models.Event @event)
 		{
 			switch (@event)
 			{
@@ -271,7 +271,7 @@ public class AsyncInboxApi : IAsyncInboxApi, IAsyncDisposable, IDisposable
 			connection.UnsubscribeFromEntryEvents(inboxId);
 		}
 
-		public override void HandleEvent(Event @event)
+		public override void HandleEvent(Core.Models.Event @event)
 		{
 			switch (@event)
 			{

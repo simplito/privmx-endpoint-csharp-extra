@@ -75,7 +75,7 @@ public sealed class AsyncEventQueue : IAsyncDisposable
 	/// <param name="token"></param>
 	/// <exception cref="InvalidOperationException">Throw when this method is called when another enumeration is in progress.</exception>
 	/// <returns>Stream of incoming events.</returns>
-	public async IAsyncEnumerable<Event> WaitEventsAsync(
+	public async IAsyncEnumerable<Core.Models.Event> WaitEventsAsync(
 		[EnumeratorCancellation]
 		CancellationToken token = default)
 	{

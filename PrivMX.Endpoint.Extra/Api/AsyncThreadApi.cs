@@ -293,7 +293,7 @@ public sealed class AsyncThreadApi : IAsyncDisposable, IDisposable, IAsyncThread
 			Connection.UnsubscribeFromThreadEvents();
 		}
 
-		public override void HandleEvent(Event @event)
+		public override void HandleEvent(Core.Models.Event @event)
 		{
 			switch (@event)
 			{
@@ -340,7 +340,7 @@ public sealed class AsyncThreadApi : IAsyncDisposable, IDisposable, IAsyncThread
 			Connection.UnsubscribeFromMessageEvents(ThreadId);
 		}
 
-		public override void HandleEvent(Event @event)
+		public override void HandleEvent(Core.Models.Event @event)
 		{
 			switch (@event)
 			{
