@@ -14,7 +14,7 @@ namespace PrivMX.Endpoint.Extra.Abstractions;
 /// <summary>
 ///     Abstract class representing a Privmx file stream.
 /// </summary>
-public abstract class PrivmxFileStream : Stream
+public abstract class PrivmxFileStream : System.IO.Stream
 {
     /// <summary>
     ///     Gets the file identifier.
