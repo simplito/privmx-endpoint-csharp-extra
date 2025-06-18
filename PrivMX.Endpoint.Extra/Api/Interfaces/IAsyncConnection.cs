@@ -37,6 +37,7 @@ public interface IAsyncConnection
 	///     Gets a list of users of given context.
 	/// </summary>
 	/// <param name="contextId">ID of the context</param>
+	/// <param name="token">Cancellation token.</param>
 	/// <returns>A task that represents the asynchronous operation. The task result contains a list of users Info.</returns>
 	ValueTask<List<UserInfo>> GetContextUsers(
 		string contextId, CancellationToken token = default);

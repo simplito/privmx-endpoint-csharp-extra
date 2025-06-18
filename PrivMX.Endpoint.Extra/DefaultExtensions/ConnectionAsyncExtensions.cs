@@ -68,7 +68,9 @@ public static class ConnectionAsyncExtensions
 	/// <summary>
 	///		Gets a list of users of the Context.
 	/// </summary>
+	/// <param name="connection">Extended object.</param>
 	/// <param name="contextId">ID of the Context to get users from.</param>
+	/// <param name="token">Cancellation token.</param>
 	/// <returns>List of users Info.</returns>
 	public static ValueTask<List<UserInfo>> GetContextUsersAsync(this IConnection connection,
 		string contextId, CancellationToken token = default)

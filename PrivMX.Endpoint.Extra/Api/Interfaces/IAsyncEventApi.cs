@@ -33,9 +33,10 @@ public interface IAsyncEventApi
 		CancellationToken token = default);
 
 	/// <summary>
-	///     Gets the events in a given Thread and channel.
+	///     Gets the events in a given Context and channel.
 	/// </summary>
-	/// <param name="threadId">ID of the Thread to get events from.</param>
+	/// <param name="contextId">ID of the Context.</param>
+	/// <param name="channelName">Name of the Channel.</param>
 	/// <returns>Stream of Thread message events.</returns>
 	IObservable<ContextCustomEvent> GetCustomEvents(string contextId, string channelName);
 }

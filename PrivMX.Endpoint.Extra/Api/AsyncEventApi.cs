@@ -88,7 +88,8 @@ public sealed class AsyncEventApi : IAsyncDisposable, IDisposable, IAsyncEventAp
 	/// <summary>
 	///     Stream of events related to a particular custom events.
 	/// </summary>
-	/// <param name="threadId">ID of the thread.</param>
+	/// <param name="contextId">ID of the Context.</param>
+	/// <param name="channelName">Name of the Channel.</param>
 	/// <returns>Observable stream of events.</returns>
 	public IObservable<ContextCustomEvent> GetCustomEvents(string contextId, string channelName)
 	{
