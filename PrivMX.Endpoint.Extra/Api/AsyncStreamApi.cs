@@ -22,8 +22,11 @@ using PrivMX.Endpoint.Stream.Models;
 using PrivMX.Endpoint.Store;
 using System.ComponentModel;
 
-namespace PrivMX.Endpoint.Extra.Api;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Runtime.Serialization;
+using System.IO;
 
+namespace PrivMX.Endpoint.Extra.Api;
 
 public sealed class AsyncStreamApi : IAsyncDisposable, IDisposable, IAsyncStreamApi
 {
@@ -35,6 +38,8 @@ public sealed class AsyncStreamApi : IAsyncDisposable, IDisposable, IAsyncStream
 	private readonly IAsyncEventApi _eventApi;
 	// private readonly ThreadChannelEventDispatcher _threadChannelEventDispatcher;
 	// private readonly Dictionary<string, ThreadMessageChannelEventDispatcher> _threadMessageDispatchers;
+	private readonly Dictionary<long, string> _map = new Dictionary<long, string>();
+	private readonly Dictionary<string, List<UserWithPubKey>> _map2 = new Dictionary<string, List<UserWithPubKey>>();
 	private DisposeBool _disposed;
 
 	// public AsyncStreamApi(Connection connection, StoreApi storeApi, EventApi eventApi, IAsyncStoreApi asyncStoreApi, IAsyncEventApi asyncEventApi) : this(StreamApi.Create(connection, storeApi, eventApi), asyncStoreApi, asyncEventApi, connection.GetConnectionId(),
@@ -60,21 +65,31 @@ public sealed class AsyncStreamApi : IAsyncDisposable, IDisposable, IAsyncStream
 		return default;
 	}
 
-	public ValueTask<string> CreateStreamRoomAsync(string contextId, List<UserWithPubKey> users,
+	public async ValueTask<string> CreateStreamRoomAsync(string contextId, List<UserWithPubKey> users,
 		List<UserWithPubKey> managers, byte[] publicMeta, byte[] privateMeta, ContainerPolicy? policies = null,
 		CancellationToken token = default)
 	{
 		_disposed.ThrowIfDisposed(nameof(AsyncStreamApi));
-		return _streamApi.CreateStreamRoomAsync(contextId, users, managers, publicMeta, privateMeta, policies, token);
+		string id = await _streamApi.CreateStreamRoomAsync(contextId, users, managers, publicMeta, convertToPrivateData(users), policies, token);
+		lock (_map)
+		{
+			_map2[id] = users;
+		}
+		return id;
 	}
 
-	public ValueTask UpdateStreamRoomAsync(string streamRoomId, List<UserWithPubKey> users, List<UserWithPubKey> managers,
+	public async ValueTask UpdateStreamRoomAsync(string streamRoomId, List<UserWithPubKey> users, List<UserWithPubKey> managers,
 		byte[] publicMeta, byte[] privateMeta, long version, bool force, bool forceGenerateNewKey,
 		ContainerPolicy? policies = null, CancellationToken token = default)
 	{
 		_disposed.ThrowIfDisposed(nameof(AsyncStreamApi));
-		return _streamApi.UpdateStreamRoomAsync(streamRoomId, users, managers, publicMeta, privateMeta, version, force,
+		await _streamApi.UpdateStreamRoomAsync(streamRoomId, users, managers, publicMeta, convertToPrivateData(users), version, force,
 				forceGenerateNewKey, policies, token);
+		lock (_map)
+		{
+			_map2[streamRoomId] = users;
+		}
+		return;
 	}
 
 	public ValueTask DeleteStreamRoomAsync(string streamRoomId, CancellationToken token = default)
@@ -116,24 +131,57 @@ public sealed class AsyncStreamApi : IAsyncDisposable, IDisposable, IAsyncStream
 		return _streamApi.PublishStreamAsync(streamId, token);
 	}
 
-    public ValueTask StreamTrackSendDataAsync(long streamId,
+    public async ValueTask StreamTrackSendDataAsync(long streamId,
 		byte[] data, CancellationToken token = default)
 	{
 		_disposed.ThrowIfDisposed(nameof(AsyncStreamApi));
-		return _streamApi.StreamTrackSendDataAsync(streamId, data, token);
+		string id;
+		lock (_map)
+		{
+			id = _map[streamId];
+		}
+		var room = await GetStreamRoomAsync(id, token);
+		var users = convertFromPrivateMeta(room.PrivateMeta);
+		await _eventApi.EmitEvent(room.ContextId, users, $"stream/${id}", data);
 	}
 
-    public ValueTask<long> JoinStreamAsync(string streamRoomId, string? settings = null, CancellationToken token = default)
+    public async ValueTask<long> JoinStreamAsync(string streamRoomId, string? settings = null, CancellationToken token = default)
 	{
 		_disposed.ThrowIfDisposed(nameof(AsyncStreamApi));
-		return _streamApi.JoinStreamAsync(streamRoomId, settings, token);
+		long id = await _streamApi.JoinStreamAsync(streamRoomId, settings, token);
+		// _storeApi.GetStoreEvents().Subscribe(ev =>
+		//        {
+		// 	       ev.Match(_ => {},
+		// 		       evt => {
+		// 					lock (_map)
+		// 					{
+		// 						_map2[evt.StoreId] = convertFromPrivateMeta(evt.PrivateMeta);
+		// 					}
+		// 			   },
+		// 		       _ => {},
+		// 		       _ => {});
+		//        });
+		return id;
 	}
 
-    public ValueTask StreamTrackRecvDataAsync(long streamId,
+    public async ValueTask StreamTrackRecvDataAsync(long streamId,
 		IObserver<StreamData> observer, CancellationToken token = default)
 	{
 		_disposed.ThrowIfDisposed(nameof(AsyncStreamApi));
-		return _streamApi.StreamTrackRecvDataAsync(streamId, observer, token);
+		// return _streamApi.StreamTrackRecvDataAsync(streamId, observer, token);
+		string id;
+		lock (_map)
+		{
+			id = _map[streamId];
+		}
+		var room = await GetStreamRoomAsync(id, token);
+
+		// _eventApi.GetCustomEvents(room.ContextId, $"stream/${id}").Subscribe(e => {
+			// if (e.Channel == $"context/${room.ContextId}/stream/${id}") {
+			// 	var data = new StreamData() { UserId = e.Data.UserId, Data = e.Data.Payload };
+			// 	observer.OnNext(data);
+			// }
+		// });
 	}
 
     public ValueTask UnpublishStreamAsync(long streamId,
@@ -267,4 +315,26 @@ public sealed class AsyncStreamApi : IAsyncDisposable, IDisposable, IAsyncStream
 	// 		}
 	// 	}
 	// }
+
+	private byte[] convertToPrivateData(List<UserWithPubKey> users)
+	{
+		byte[] bytes;
+		IFormatter formatter = new BinaryFormatter();
+		using (MemoryStream stream = new MemoryStream())
+		{
+			formatter.Serialize(stream, users);
+			bytes = stream.ToArray();
+		}
+		return bytes;
+	}
+
+	private List<UserWithPubKey> convertFromPrivateMeta(byte[] data)
+	{
+		IFormatter formatter = new BinaryFormatter();
+		using (MemoryStream stream = new MemoryStream())
+		{
+			stream.Write(data);
+			return (List<UserWithPubKey>)formatter.Deserialize(stream);
+		}
+	}
 }
