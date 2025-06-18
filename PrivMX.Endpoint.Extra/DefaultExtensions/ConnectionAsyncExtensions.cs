@@ -66,6 +66,19 @@ public static class ConnectionAsyncExtensions
 	}
 
 	/// <summary>
+	///		Gets a list of users of the Context.
+	/// </summary>
+	/// <param name="contextId">ID of the Context to get users from.</param>
+	/// <returns>List of users Info.</returns>
+	public static ValueTask<List<UserInfo>> GetContextUsersAsync(this IConnection connection,
+		string contextId, CancellationToken token = default)
+	{
+		if (connection is null)
+			throw new ArgumentNullException(nameof(connection));
+		return WrapperCallsExecutor.Execute(() => connection.GetContextUsers(contextId), token);
+	}
+
+	/// <summary>
 	///     Disconnects from the PrivMX Bridge.
 	/// </summary>
 	public static ValueTask DisconnectAsync(this IConnection connection, CancellationToken token = default)

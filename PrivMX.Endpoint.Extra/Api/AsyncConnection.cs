@@ -54,6 +54,14 @@ public sealed class AsyncConnection : IAsyncDisposable, IAsyncConnection
 		return Connection.ListContextsAsync(pagingQuery, token);
 	}
 
+	/// <inheritdoc />
+	public ValueTask<List<UserInfo>> GetContextUsers(
+		string contextId, CancellationToken token = default)
+	{
+		_disposeBool.ThrowIfDisposed(nameof(Connection));
+		return Connection.GetContextUsersAsync(contextId, token);
+	}
+
 	/// <summary>
 	///     Disposes async connection with all related resources.
 	/// </summary>

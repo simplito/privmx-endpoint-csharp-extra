@@ -32,4 +32,12 @@ public interface IAsyncConnection
 	/// <returns>A task that represents the asynchronous operation. The task result contains a paging list of contexts.</returns>
 	ValueTask<PagingList<Context>> ListContexts(
 		PagingQuery pagingQuery, CancellationToken token = default);
+
+	/// <summary>
+	///     Gets a list of users of given context.
+	/// </summary>
+	/// <param name="contextId">ID of the context</param>
+	/// <returns>A task that represents the asynchronous operation. The task result contains a list of users Info.</returns>
+	ValueTask<List<UserInfo>> GetContextUsers(
+		string contextId, CancellationToken token = default);
 }
