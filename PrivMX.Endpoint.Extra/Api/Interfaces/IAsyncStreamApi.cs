@@ -45,8 +45,7 @@ public interface IAsyncStreamApi
 
     ValueTask<long> JoinStreamAsync(string streamRoomId, string? settings = null, CancellationToken token = default);
 
-    ValueTask StreamTrackRecvDataAsync(long streamId,
-		IObserver<StreamData> observer, CancellationToken token = default);
+    IObservable<StreamData> StreamTrackRecvData(long streamId);
 
     ValueTask UnpublishStreamAsync(long streamId,
 		CancellationToken token = default);
