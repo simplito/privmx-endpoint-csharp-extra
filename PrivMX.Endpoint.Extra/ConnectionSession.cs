@@ -110,8 +110,10 @@ public sealed class ConnectionSession : IAsyncDisposable
 			return;
 		try
 		{
-			await ValueTaskTools.WhenAll(_connection.DisposeAsync(), _threadApi.DisposeAsync(),
-				_storeApi.DisposeAsync(), _inboxApi.DisposeAsync());
+			await ValueTaskTools.WhenAll(
+				_streamApi.DisposeAsync, _eventApi.DisposeAsync,
+				_inboxApi.DisposeAsync, _storeApi.DisposeAsync,
+				_threadApi.DisposeAsync, _connection.DisposeAsync);
 		}
 		catch (Exception e)
 		{

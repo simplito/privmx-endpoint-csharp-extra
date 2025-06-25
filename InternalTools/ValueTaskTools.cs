@@ -18,7 +18,7 @@ namespace Internal;
 public class ValueTaskTools
 {
 #if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
-	public static async ValueTask WhenAll(params ValueTask[] tasks)
+	public static async ValueTask WhenAll(params Func<ValueTask>[] tasks)
 	{
 		if (tasks is null)
 			throw new ArgumentNullException(nameof(tasks));
@@ -29,7 +29,7 @@ public class ValueTaskTools
 		for (var i = 0; i < tasks.Length; i++)
 			try
 			{
-				await tasks[i].ConfigureAwait(false);
+				await tasks[i]().ConfigureAwait(false);
 			}
 			catch (Exception ex)
 			{
