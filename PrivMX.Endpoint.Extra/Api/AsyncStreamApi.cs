@@ -40,6 +40,7 @@ public sealed class AsyncStreamApi : IAsyncDisposable, IDisposable, IAsyncStream
 	private readonly StreamRoomUsersProvider _usersProvider;
 	private readonly StreamIdGenerator _idGenerator = new StreamIdGenerator();
 	private IDisposable? _subscription = null;
+	private readonly object _subscriptionLock = new object();
 	// private readonly ThreadChannelEventDispatcher _threadChannelEventDispatcher;
 	// private readonly Dictionary<string, ThreadMessageChannelEventDispatcher> _threadMessageDispatchers;
 
@@ -324,6 +325,7 @@ public sealed class AsyncStreamApi : IAsyncDisposable, IDisposable, IAsyncStream
 		CancellationToken token = default)
 	{
 		_disposed.ThrowIfDisposed(nameof(AsyncStreamApi));
+		ensureSubscribed();
 		return _streamApi.PublishStreamAsync(streamId, token);
 	}
 
@@ -338,6 +340,7 @@ public sealed class AsyncStreamApi : IAsyncDisposable, IDisposable, IAsyncStream
     public async ValueTask<long> JoinStreamAsync(string streamRoomId, string? settings = null, CancellationToken token = default)
 	{
 		_disposed.ThrowIfDisposed(nameof(AsyncStreamApi));
+		ensureSubscribed();
 		long streamId = _idGenerator.Generate();
 		_usersProvider.SetStreamId(streamId, streamRoomId);
 		await _usersProvider.GetUsers(streamId);
@@ -390,7 +393,7 @@ public sealed class AsyncStreamApi : IAsyncDisposable, IDisposable, IAsyncStream
 
 	public void Dispose()
 	{
-		lock(_subscription) 
+		lock(_subscriptionLock) 
 		{
 			if (_subscription != null)
 			{
@@ -504,7 +507,7 @@ public sealed class AsyncStreamApi : IAsyncDisposable, IDisposable, IAsyncStream
 
 	private void ensureSubscribed()
 	{
-		lock(_subscription)
+		lock(_subscriptionLock)
 		{
 			if (_subscription == null)
 			{
