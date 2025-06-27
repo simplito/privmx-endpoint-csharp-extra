@@ -13,6 +13,7 @@ using Internal;
 using PrivMX.Endpoint.Core;
 using PrivMX.Endpoint.Core.Models;
 using PrivMX.Endpoint.Extra.Api.Interfaces;
+using PrivMX.Endpoint.Extra.Events;
 using PrivMX.Endpoint.Extra.Internals;
 using System.ComponentModel;
 
@@ -26,15 +27,18 @@ public sealed class AsyncConnection : IAsyncDisposable, IAsyncConnection
 	private static readonly Logger.SourcedLogger<AsyncConnection> Logger = default;
 	private DisposeBool _disposeBool;
 
+	private readonly ConnectionEventDispatcher _connectionEventDispatcher;
+
 	/// <summary>
 	///     Wraps existing connection into async connection.
 	///     It's user responsibility to provide valid (connected) connection.
 	/// </summary>
 	/// <param name="connection">Connection to wrap</param>
 	[EditorBrowsable(EditorBrowsableState.Advanced)]
-	public AsyncConnection(IConnection connection)
+	public AsyncConnection(IConnection connection, long connectionId, IEventDispatcher eventDispatcher)
 	{
 		Connection = connection;
+		_connectionEventDispatcher = new ConnectionEventDispatcher(connection, connectionId, eventDispatcher);
 	}
 
 	private IConnection Connection { get; }
@@ -81,11 +85,12 @@ public sealed class AsyncConnection : IAsyncDisposable, IAsyncConnection
 	/// <param name="token">Cancelation token.</param>
 	/// <returns>Created and connected instance of the <see cref="Connection" />.</returns>
 	public static async Task<AsyncConnection> Connect(string userPrivateKey, string solutionId, string platformUrl,
+		IEventDispatcher eventDispatcher,
 		CancellationToken token = default)
 	{
 		Logger.Log(LogLevel.Trace, "Connecting to {0}, solution {1}", platformUrl, solutionId);
 		var connection = await ConnectionAsyncExtensions.ConnectAsync(userPrivateKey, solutionId, platformUrl, token);
-		return new AsyncConnection(connection);
+		return new AsyncConnection(connection, connection.GetConnectionId(), eventDispatcher);
 	}
 
 	/// <summary>
@@ -96,10 +101,51 @@ public sealed class AsyncConnection : IAsyncDisposable, IAsyncConnection
 	/// <param name="token">Cancellation token.</param>
 	/// <returns>Created and connected instance of the <see cref="Connection" />.</returns>
 	public static async Task<AsyncConnection> ConnectPublic(string solutionId, string platformUrl,
+		IEventDispatcher eventDispatcher,
 		CancellationToken token = default)
 	{
 		Logger.Log(LogLevel.Trace, "Connecting to {0}, solution {1} as public", platformUrl, solutionId);
 		var connection = await ConnectionAsyncExtensions.ConnectPublicAsync(solutionId, platformUrl, token);
-		return new AsyncConnection(connection);
+		return new AsyncConnection(connection, connection.GetConnectionId(), eventDispatcher);
+	}
+
+	public IObservable<ConnectionEvent> GetConnectionEvents()
+	{
+		return _connectionEventDispatcher;
+	}
+
+	private class ConnectionEventDispatcher(
+		IConnection connection,
+		long connectionId,
+		IEventDispatcher eventDispatcher)
+		: ChannelEventDispatcher<ConnectionEvent>("connection", connectionId, eventDispatcher)
+	{
+		private IConnection Connection {get; } = connection;
+
+		protected override void OpenChanel()
+		{
+		}
+
+		protected override void CloseChanel()
+		{
+		}
+
+		public override void HandleEvent(Core.Models.Event @event)
+		{
+			switch (@event)
+			{
+				case LibConnectedEvent connectedEvent:
+					WrappedInvokeObservable.Send(
+						new ConnectionEvent(connectedEvent));
+					break;
+				case LibDisconnectedEvent disconnectedEvent:
+					WrappedInvokeObservable.Send(
+						new ConnectionEvent(disconnectedEvent));
+					break;
+				default:
+					Logger.Log(LogLevel.Warning, "Invalid event was passed to channel dispatcher: {0}.", @event);
+					break;
+			}
+		}
 	}
 }

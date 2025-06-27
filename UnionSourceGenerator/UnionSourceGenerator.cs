@@ -206,7 +206,7 @@ public readonly partial struct {structName}
     /// </summary>
 	public static explicit operator {secondTypeFullName}({structName} union)
 	{{
-		if (union._elementSet == IsFirstType)
+		if (union._elementSet == IsSecondType)
 			return union._second;
 		throw new InvalidCastException(
 			$""Union doesn't hold a value of type {secondTypeFullName} but of type {{union.ElementType}} instead."");

@@ -10,6 +10,7 @@
 //
 
 using PrivMX.Endpoint.Core.Models;
+using PrivMX.Endpoint.Extra.Events;
 
 namespace PrivMX.Endpoint.Extra.Api.Interfaces;
 
@@ -41,4 +42,6 @@ public interface IAsyncConnection
 	/// <returns>A task that represents the asynchronous operation. The task result contains a list of users Info.</returns>
 	ValueTask<List<UserInfo>> GetContextUsers(
 		string contextId, CancellationToken token = default);
+
+	IObservable<ConnectionEvent> GetConnectionEvents();
 }

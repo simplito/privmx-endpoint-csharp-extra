@@ -107,6 +107,12 @@ internal sealed class PrivMXEventDispatcher : IEventDispatcher
 					}
 					if (!_chanelNameToObservables.TryGetValue(serializedEvent.ConnectionId, out var dict))
 						continue;
+					if (serializedEvent.Type == "libConnected" || serializedEvent.Type == "libDisconnected")
+					{
+						if (dict.TryGetValue("connection", out handler))
+							handler.HandleEvent(serializedEvent);
+						continue;
+					}
 					if (dict.TryGetValue(serializedEvent.Channel, out handler))
 						handler.HandleEvent(serializedEvent);
 					if (dict.TryGetValue(WildcardChannel, out handler))

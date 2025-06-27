@@ -155,13 +155,13 @@ public sealed class ConnectionSession : IAsyncDisposable
 	private static ConnectionSession CreateInternal(Connection connection, string publicKey, string privateKey)
 	{
 		var connectionId = connection.GetConnectionId();
-		var asyncConnection = new AsyncConnection(connection);
 		var threadApi = PrivMX.Endpoint.Thread.ThreadApi.Create(connection);
 		var storeApi = PrivMX.Endpoint.Store.StoreApi.Create(connection);
 		var inboxApi = PrivMX.Endpoint.Inbox.InboxApi.Create(connection, threadApi, storeApi);
 		var eventApi = PrivMX.Endpoint.Event.EventApi.Create(connection);
 		var streamApi = PrivMX.Endpoint.Stream.StreamApi.Create(connection, storeApi, eventApi);
 		var eventDispatcher = PrivMXEventDispatcher.Instance;
+		var asyncConnection = new AsyncConnection(connection, connectionId, eventDispatcher);
 		var asyncThreadApi = new AsyncThreadApi(threadApi, connectionId, eventDispatcher);
 		var asyncStoreApi = new AsyncStoreApi(storeApi, connectionId, eventDispatcher);
 		var asyncInboxApi = new AsyncInboxApi(inboxApi, connectionId, eventDispatcher);
