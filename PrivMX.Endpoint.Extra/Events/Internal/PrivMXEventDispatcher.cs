@@ -27,7 +27,7 @@ internal sealed class PrivMXEventDispatcher : IEventDispatcher
 	private const int IsRunning = 1;
 	private const int IsNotRunning = 0;
 	public static readonly PrivMXEventDispatcher Instance = new();
-	private readonly Dictionary<string, IEventHandler> _chanelNameToObservables = new();
+	private readonly Dictionary<long, Dictionary<string, IEventHandler>> _chanelNameToObservables = new();
 	private readonly Logger.SourcedLogger<PrivMXEventDispatcher> Logger = default;
 	private int _isRunning;
 
@@ -44,18 +44,18 @@ internal sealed class PrivMXEventDispatcher : IEventDispatcher
 
 	public void AddHandler(string channel, long connectionId, IEventHandler handler)
 	{
-		// ReSharper disable once InconsistentlySynchronizedField
-		if (_chanelNameToObservables.ContainsKey(channel))
-			throw new InvalidOperationException(
-				"Only single handler per channel is supported. Remove previous handler first.");
-
 		// lock for write 
 		lock (_chanelNameToObservables)
 		{
-			if (_chanelNameToObservables.TryGetValue(channel, out var currentHandlers))
+			_chanelNameToObservables.TryGetValue(connectionId, out var dict);
+			if (dict == null) {
+				dict = new();
+				_chanelNameToObservables[connectionId] = dict;
+			}
+			if (dict.TryGetValue(channel, out var currentHandlers))
 				throw new InvalidOperationException(
 					"Only single handler per channel is supported. Remove previous handler first.");
-			_chanelNameToObservables[channel] = handler;
+			dict[channel] = handler;
 			if (Interlocked.Exchange(ref _isRunning, IsRunning) == IsNotRunning)
 				EventPump();
 		}
@@ -63,17 +63,18 @@ internal sealed class PrivMXEventDispatcher : IEventDispatcher
 
 	public void RemoveHandler(string channel, long connectionId, IEventHandler handler)
 	{
-		// ReSharper disable once InconsistentlySynchronizedField
-		if (!_chanelNameToObservables.TryGetValue(channel, out var originalHandlers))
-			return;
-
 		// lock for write 
 		lock (_chanelNameToObservables)
 		{
-			if (!_chanelNameToObservables.Remove(channel, out var removed))
+			_chanelNameToObservables.TryGetValue(connectionId, out var dict);
+			if (dict == null) {
+				throw new InvalidOperationException(
+					"Invalid connectionId.");
+			}
+			if (!dict.Remove(channel, out var removed))
 				return;
 			removed.Dispose();
-			if (_chanelNameToObservables.Count == 0 && Interlocked.Exchange(ref _isRunning, IsNotRunning) == IsRunning)
+			if (dict.Count == 0 && Interlocked.Exchange(ref _isRunning, IsNotRunning) == IsRunning)
 			{
 				CancellationTokenSource.Cancel();
 				CancellationTokenSource = new CancellationTokenSource();
@@ -99,10 +100,16 @@ internal sealed class PrivMXEventDispatcher : IEventDispatcher
 				IEventHandler? handler = null;
 				try
 				{
-					// ReSharper disable once InconsistentlySynchronizedField
-					if (_chanelNameToObservables.TryGetValue(serializedEvent.Channel, out handler))
+					if (_chanelNameToObservables.TryGetValue(WildcardConnectionId, out var wildcardDict))
+					{
+						if (wildcardDict.TryGetValue(WildcardChannel, out handler))
+							handler.HandleEvent(serializedEvent);
+					}
+					if (!_chanelNameToObservables.TryGetValue(serializedEvent.ConnectionId, out var dict))
+						continue;
+					if (dict.TryGetValue(serializedEvent.Channel, out handler))
 						handler.HandleEvent(serializedEvent);
-					if (_chanelNameToObservables.TryGetValue(WildcardChannel, out handler))
+					if (dict.TryGetValue(WildcardChannel, out handler))
 						handler.HandleEvent(serializedEvent);
 				}
 				catch (Exception exception)
