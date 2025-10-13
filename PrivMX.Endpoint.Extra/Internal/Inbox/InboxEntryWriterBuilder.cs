@@ -25,7 +25,7 @@ public ref struct InboxEntryWriterBuilder(string inboxId, IInboxApi inboxApi)
 	private readonly Dictionary<string, (byte[] privateMeta, byte[] publicMeta, long lenght, byte? fillValue)> _files =
 		new();
 
-	private string? _privateKey;
+	private byte[]? _privateKey;
 
 	/// <summary>
 	///     Declares data to be written to the entry.
@@ -44,7 +44,7 @@ public ref struct InboxEntryWriterBuilder(string inboxId, IInboxApi inboxApi)
 	/// </summary>
 	/// <param name="privateKey">Private key</param>
 	/// <returns>Self</returns>
-	public InboxEntryWriterBuilder SetPrivateKey(string privateKey)
+	public InboxEntryWriterBuilder SetPrivateKey(byte[] privateKey)
 	{
 		_privateKey = privateKey;
 		return this;
@@ -79,7 +79,7 @@ public ref struct InboxEntryWriterBuilder(string inboxId, IInboxApi inboxApi)
 	}
 
 	private static async ValueTask<ManagedInboxEntryWriter> PrepareEntryAsync(IInboxApi inboxApi, string inboxId,
-		byte[] data, string? privateKye,
+		byte[] data, byte[]? privateKey,
 		Dictionary<string, (byte[] privateMeta, byte[] publicMeta, long lenght, byte? fillValue)> files,
 		CancellationToken token = default)
 	{
@@ -90,7 +90,7 @@ public ref struct InboxEntryWriterBuilder(string inboxId, IInboxApi inboxApi)
 			handles.Add(handle);
 		}
 
-		var entryHandle = await inboxApi.PrepareEntryAsync(inboxId, data, handles, privateKye!, token);
+		var entryHandle = await inboxApi.PrepareEntryAsync(inboxId, data, handles, privateKey!, token);
 		var streams = new Dictionary<string, InboxWriteFileStream>();
 		foreach (var (name, privateMeta, publicMeta, lenght, fillValue, handle) in files.Zip(handles,
 			         (pair, handle) => (pair.Key, pair.Value.privateMeta, pair.Value.publicMeta, pair.Value.lenght,

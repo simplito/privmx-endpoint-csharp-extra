@@ -74,7 +74,7 @@ public static class InboxApiExtensions
 	}
 
 	public static ValueTask<long> PrepareEntryAsync(this IInboxApi inboxApi, string inboxId, byte[] data,
-		List<long> inboxFileHandles, string userPrivKey, CancellationToken token = default)
+		List<long> inboxFileHandles, byte[] userPrivKey, CancellationToken token = default)
 	{
 		if (inboxApi is null)
 			throw new ArgumentNullException(nameof(inboxApi));
