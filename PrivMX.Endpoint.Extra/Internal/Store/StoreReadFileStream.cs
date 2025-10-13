@@ -54,7 +54,7 @@ internal sealed class StoreReadonlyFileStream : PrivmxFileStream
 
 	public override string? FileId { get; }
 	public override ReadOnlySpan<byte> PublicMeta => _publicMeta;
-	public override ReadOnlySpan<byte> PrivateMeta => _publicMeta;
+	public override ReadOnlySpan<byte> PrivateMeta => _privateMeta;
 
 	public override void Flush()
 	{
