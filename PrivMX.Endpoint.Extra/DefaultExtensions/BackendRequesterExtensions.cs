@@ -30,7 +30,7 @@ public static class BackendRequesterAsyncExtensions
 	/// <param name="token">Cancellation token.</param>
 	/// <returns>JSON string representing raw server response.</returns>
 	public static ValueTask<string> BackendRequestAsync(this IBackendRequester backendRequester, string serverUrl,
-		string accessToken, string method, string paramsAsJson, CancellationToken token = default)
+		byte[] accessToken, string method, string paramsAsJson, CancellationToken token = default)
 	{
 		if (backendRequester is null)
 			throw new ArgumentNullException(nameof(backendRequester));
@@ -69,7 +69,7 @@ public static class BackendRequesterAsyncExtensions
 	/// <param name="token">Cancellation token.</param>
 	/// <returns>JSON string representing raw server response.</returns>
 	public static ValueTask<string> BackendRequestAsync(this IBackendRequester backendRequester, string serverUrl,
-		string apiKeyId, string apiKeySecret, long mode, string method, string paramsAsJson,
+		string apiKeyId, byte[] apiKeySecret, long mode, string method, string paramsAsJson,
 		CancellationToken token = default)
 	{
 		if (backendRequester is null)

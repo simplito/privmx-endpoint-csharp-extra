@@ -72,7 +72,7 @@ public sealed class AsyncConnection : IAsyncDisposable, IAsyncConnection
 	/// <param name="platformUrl">PrivMX Bridge URL.</param>
 	/// <param name="token">Cancelation token.</param>
 	/// <returns>Created and connected instance of the <see cref="Connection" />.</returns>
-	public static async Task<AsyncConnection> Connect(string userPrivateKey, string solutionId, string platformUrl,
+	public static async Task<AsyncConnection> Connect(byte[] userPrivateKey, string solutionId, string platformUrl,
 		CancellationToken token = default)
 	{
 		Logger.Log(LogLevel.Trace, "Connecting to {0}, solution {1}", platformUrl, solutionId);

@@ -33,7 +33,7 @@ public sealed class ConnectionSession : IAsyncDisposable
 	private readonly AsyncThreadApi _threadApi;
 	private DisposeBool _disposed;
 
-	private ConnectionSession(string publicKey, string privateKey, AsyncConnection connection, AsyncThreadApi threadApi,
+	private ConnectionSession(string publicKey, byte[] privateKey, AsyncConnection connection, AsyncThreadApi threadApi,
 		AsyncStoreApi storeApi, AsyncInboxApi inboxApi)
 	{
 		_connection = connection;
@@ -52,7 +52,7 @@ public sealed class ConnectionSession : IAsyncDisposable
 	/// <summary>
 	///     Private key of the user. If connection is anonymous, this will be empty.
 	/// </summary>
-	public string PrivateKey { get; }
+	public byte[] PrivateKey { get; }
 
 	/// <summary>
 	///     Connection asynchronous api.
@@ -111,7 +111,7 @@ public sealed class ConnectionSession : IAsyncDisposable
 	/// <param name="platformUrl">Bridge url.</param>
 	/// <param name="token">Cancellation token.</param>
 	/// <returns>Authorized connection session.</returns>
-	public static async ValueTask<ConnectionSession> Create(string userPrivateKey, string publicKey, string solutionId,
+	public static async ValueTask<ConnectionSession> Create(byte[] userPrivateKey, string publicKey, string solutionId,
 		string platformUrl, CancellationToken token = default)
 	{
 		var connection = await ConnectionAsyncExtensions.ConnectAsync(userPrivateKey, solutionId, platformUrl, token);
@@ -129,10 +129,10 @@ public sealed class ConnectionSession : IAsyncDisposable
 		CancellationToken token = default)
 	{
 		var connection = await ConnectionAsyncExtensions.ConnectPublicAsync(solutionId, platformUrl, token);
-		return CreateInternal(connection, string.Empty, string.Empty);
+		return CreateInternal(connection, string.Empty, Array.Empty<byte>());
 	}
 
-	private static ConnectionSession CreateInternal(Connection connection, string publicKey, string privateKey)
+	private static ConnectionSession CreateInternal(Connection connection, string publicKey, byte[] privateKey)
 	{
 		var connectionId = connection.GetConnectionId();
 		var asyncConnection = new AsyncConnection(connection);
