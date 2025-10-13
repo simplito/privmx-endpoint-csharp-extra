@@ -30,7 +30,7 @@ public static class ConnectionAsyncExtensions
 	/// <param name="platformUrl">PrivMX Bridge URL.</param>
 	/// <param name="token">Cancellation token.</param>
 	/// <returns>Created and connected instance of the Connection</returns>
-	public static ValueTask<Connection> ConnectAsync(string userPrivKey, string solutionId,
+	public static ValueTask<Connection> ConnectAsync(byte[] userPrivKey, string solutionId,
 		string platformUrl, CancellationToken token = default)
 	{
 		return WrapperCallsExecutor.Execute(
